@@ -812,7 +812,7 @@ body[data-view="presentation"] .presentation-frame {
 
 .presentation-main {
   --presentation-track-width: min(98vw, 1780px);
-  min-height: calc(100vh - 48px);
+  min-height: calc(100dvh - 48px);
   display: grid;
   align-content: center;
   justify-items: center;
@@ -824,6 +824,7 @@ body[data-view="presentation"] .presentation-frame {
 }
 
 .presentation-copy {
+  display: grid;
   justify-items: center;
   gap: 0;
   margin-bottom: 8px;
@@ -910,7 +911,7 @@ body[data-view="presentation"] .presentation-frame {
 }
 
 .overtime-screen {
-  min-height: calc(100vh - 48px);
+  min-height: calc(100dvh - 48px);
   place-content: center;
   text-align: center;
   justify-items: center;
@@ -1167,25 +1168,100 @@ body[data-view="presentation"] .presentation-frame {
     justify-content: center;
   }
 
-  .timer-value {
-    font-size: min(24vw, 19vh, 9rem);
+  body[data-view="presentation"] .presentation-frame {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 12px;
+    padding:
+      calc(10px + env(safe-area-inset-top))
+      calc(10px + env(safe-area-inset-right))
+      calc(12px + env(safe-area-inset-bottom))
+      calc(10px + env(safe-area-inset-left));
   }
 
-  .timer-panel-secondary {
+  body[data-view="presentation"] .presentation-topbar {
+    order: 2;
+    position: static;
+    margin: 0;
     width: 100%;
+    align-self: end;
   }
 
-  .presentation-main {
-    gap: 22px;
+  body[data-view="presentation"] .presentation-controls {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px;
+    border-radius: 22px;
   }
 
-  .timer-stack {
-    gap: 26px;
+  body[data-view="presentation"] .presentation-controls .primary-button,
+  body[data-view="presentation"] .presentation-controls .secondary-button,
+  body[data-view="presentation"] .presentation-controls .ghost-button {
+    width: auto;
+    min-width: 0;
+    min-height: 42px;
+    padding: 0.6rem 0.5rem;
+    border-radius: 14px;
+    font-size: 0.82rem;
+    line-height: 1.08;
+    letter-spacing: 0;
   }
 
-  #current-section-title {
+  body[data-view="presentation"] .presentation-main,
+  body[data-view="presentation"] .overtime-screen {
+    order: 1;
+    min-height: 0;
+  }
+
+  body[data-view="presentation"] .presentation-main {
+    gap: 18px;
+  }
+
+  body[data-view="presentation"] .presentation-copy {
     width: 100%;
-    font-size: min(12vw, 7rem);
+    margin-bottom: 0;
+  }
+
+  body[data-view="presentation"] #current-section-title {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 20px;
+    font-size: clamp(1.9rem, 8.6vw, 3.5rem);
+    line-height: 0.96;
+    letter-spacing: 0.03em;
+  }
+
+  body[data-view="presentation"] .timer-stack {
+    width: 100%;
+    gap: clamp(24px, 7vh, 56px);
+  }
+
+  body[data-view="presentation"] .timer-panel {
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  body[data-view="presentation"] .timer-panel-primary {
+    padding: 22px 12px 18px;
+  }
+
+  body[data-view="presentation"] .timer-panel-secondary {
+    width: 100%;
+    padding: 18px 14px;
+    margin-top: 0;
+  }
+
+  body[data-view="presentation"] .timer-value {
+    font-size: clamp(5.5rem, 29vw, 8.6rem);
+  }
+
+  body[data-view="presentation"] .timer-stack[data-layout="single"] .timer-panel-primary .timer-value {
+    font-size: clamp(6.4rem, 33vw, 10rem);
+  }
+
+  body[data-view="presentation"] .timer-panel-secondary .timer-value {
+    font-size: clamp(3.2rem, 17vw, 5.2rem);
   }
 
   #presentation-view[data-session="running"] .presentation-controls .primary-button,
@@ -1199,6 +1275,94 @@ body[data-view="presentation"] .presentation-frame {
   }
 
   .overtime-screen strong {
-    font-size: min(30vw, 32vh, 12rem);
+    font-size: clamp(6.8rem, 34vw, 11rem);
+  }
+}
+
+@media (max-height: 500px) {
+  body[data-view="presentation"] .presentation-frame {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding:
+      calc(8px + env(safe-area-inset-top))
+      calc(10px + env(safe-area-inset-right))
+      calc(10px + env(safe-area-inset-bottom))
+      calc(10px + env(safe-area-inset-left));
+  }
+
+  body[data-view="presentation"] .presentation-topbar {
+    order: 2;
+    position: static;
+    margin: 0;
+    width: 100%;
+    align-self: end;
+  }
+
+  body[data-view="presentation"] .presentation-controls {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    padding: 8px;
+  }
+
+  body[data-view="presentation"] .presentation-controls .primary-button,
+  body[data-view="presentation"] .presentation-controls .secondary-button,
+  body[data-view="presentation"] .presentation-controls .ghost-button {
+    width: auto;
+    min-width: 0;
+    min-height: 38px;
+    padding: 0.52rem 0.45rem;
+    font-size: 0.76rem;
+    line-height: 1.05;
+  }
+
+  body[data-view="presentation"] .presentation-main,
+  body[data-view="presentation"] .overtime-screen {
+    min-height: 0;
+  }
+
+  body[data-view="presentation"] .presentation-main {
+    gap: 12px;
+  }
+
+  body[data-view="presentation"] #current-section-title {
+    padding: 10px 14px;
+    font-size: clamp(1.45rem, 5.2vh, 2.5rem);
+    border-radius: 18px;
+  }
+
+  body[data-view="presentation"] .timer-stack {
+    gap: 16px;
+  }
+
+  body[data-view="presentation"] .timer-panel {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  body[data-view="presentation"] .timer-panel-primary {
+    padding: 16px 10px 14px;
+  }
+
+  body[data-view="presentation"] .timer-panel-secondary {
+    padding: 12px 14px;
+  }
+
+  body[data-view="presentation"] .timer-value {
+    font-size: min(20vw, 24vh, 7rem);
+  }
+
+  body[data-view="presentation"] .timer-stack[data-layout="single"] .timer-panel-primary .timer-value {
+    font-size: min(23vw, 30vh, 8.5rem);
+  }
+
+  body[data-view="presentation"] .timer-panel-secondary .timer-value {
+    font-size: min(11vw, 14vh, 4.2rem);
+  }
+
+  body[data-view="presentation"] .overtime-screen strong {
+    font-size: min(24vw, 34vh, 9rem);
   }
 }
