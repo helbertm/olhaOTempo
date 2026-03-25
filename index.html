@@ -2,13 +2,19 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>De olho no tempo</title>
     <meta
       name="description"
       content="Cronômetro de palco com etapas, alertas visuais, persistência local, tela cheia e wake lock best effort."
     />
+    <meta name="application-name" content="De olho no tempo" />
     <meta name="theme-color" content="#173530" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="De olho no tempo" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="./favicon.ico" sizes="any" />
     <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
@@ -139,6 +145,11 @@
                     </label>
                   </section>
                 </div>
+
+                <p id="ios-fullscreen-note" class="helper-text platform-note hidden">
+                  No iPhone e no iPad, para abrir sem as barras do navegador use Compartilhar
+                  > Adicionar à Tela de Início e abra o app pelo ícone instalado.
+                </p>
 
                 <div id="manual-total-fields" class="duration-card">
                   <p class="duration-card-title">Duração total planejada</p>

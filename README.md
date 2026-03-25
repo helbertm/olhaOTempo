@@ -110,6 +110,16 @@ Limitações reais:
 - sair da tela cheia pode acontecer por ação do usuário ou do sistema
 - o layout continua funcional fora da tela cheia
 
+### iPhone e iPad
+
+Em Safari e navegadores baseados em WebKit no iOS, o comportamento de tela cheia no navegador comum é mais limitado. Para ter uma experiência sem barras do navegador:
+
+- publique o app em HTTPS, como no GitHub Pages
+- use `Compartilhar` -> `Adicionar à Tela de Início`
+- abra o app a partir do ícone instalado
+
+O projeto já inclui `manifest.webmanifest`, `apple-touch-icon`, `apple-mobile-web-app-capable` e ajustes de safe area para esse modo instalado.
+
 ## Wake lock
 
 O app usa a Screen Wake Lock API em modo best effort.

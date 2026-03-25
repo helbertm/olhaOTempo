@@ -41,6 +41,7 @@ body {
 
 body {
   margin: 0;
+  min-height: 100dvh;
   font-family: var(--font-sans);
   background: var(--page-bg);
   color: var(--text-main);
@@ -82,6 +83,20 @@ button:focus-visible {
   width: min(1440px, calc(100vw - 32px));
   margin: 0 auto;
   padding: 24px 0 56px;
+}
+
+body[data-view="presentation"] .app-shell {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body[data-view="presentation"] .app-header {
+  display: none;
+}
+
+body[data-view="presentation"] main {
+  min-height: 100dvh;
 }
 
 .app-header,
@@ -176,6 +191,11 @@ h3 {
 .shortcut-hint {
   color: var(--text-muted);
   line-height: 1.5;
+}
+
+.platform-note {
+  margin: -2px 2px 4px;
+  padding: 0 2px;
 }
 
 .header-actions,
@@ -698,6 +718,18 @@ main {
   color: var(--presentation-text);
   border: 1px solid var(--presentation-border);
   box-shadow: 0 36px 80px rgba(8, 15, 20, 0.26);
+}
+
+body[data-view="presentation"] .presentation-frame {
+  min-height: 100dvh;
+  padding:
+    calc(18px + env(safe-area-inset-top))
+    calc(clamp(18px, 3vw, 42px) + env(safe-area-inset-right))
+    calc(24px + env(safe-area-inset-bottom))
+    calc(clamp(18px, 3vw, 42px) + env(safe-area-inset-left));
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 #presentation-view[data-theme="stage-dark"] {

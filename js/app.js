@@ -50,6 +50,7 @@ const elements = {
   showPresentationTimer: document.querySelector("#show-presentation-timer"),
   showCurrentSection: document.querySelector("#show-current-section"),
   showNextSection: document.querySelector("#show-next-section"),
+  iosFullscreenNote: document.querySelector("#ios-fullscreen-note"),
   manualTotalEnabled: document.querySelector("#manual-total-enabled"),
   manualTotalFields: document.querySelector("#manual-total-fields"),
   totalHours: document.querySelector("#total-hours"),
@@ -104,6 +105,9 @@ const app = {
   fullscreenState: {
     supported: false,
     active: false,
+    requestSupported: false,
+    standalone: false,
+    installHint: null,
   },
   wakeLockState: {
     supported: false,
@@ -309,6 +313,10 @@ function refreshConfigSummary() {
   elements.storageStatus.classList.toggle(
     "inline-status-unsaved",
     storageMeta.state === "unsaved",
+  );
+  elements.iosFullscreenNote.classList.toggle(
+    "hidden",
+    app.fullscreenState.installHint !== "ios-home-screen",
   );
 
   if (!manualIsEnabled) {
@@ -607,6 +615,7 @@ async function openPresentationMode() {
 
 function setView(view, { persist = true } = {}) {
   app.state.runtime.view = view;
+  document.body.dataset.view = view;
   elements.configView.classList.toggle("hidden", view !== "edit");
   elements.presentationView.classList.toggle("hidden", view !== "presentation");
 
@@ -662,6 +671,12 @@ function handleResetPresentation() {
 
 async function handleToggleFullscreen() {
   const result = await fullscreenController.toggle(elements.presentationView);
+
+  if (result.code === "install-required") {
+    showToast(
+      "No iPhone e no iPad, abra o app pela Tela de Início para usar sem as barras do navegador.",
+    );
+  }
 
   if (result.code === "unsupported") {
     showToast("Tela cheia indisponível neste navegador. Use a visualização normal.");
@@ -757,6 +772,12 @@ async function ensurePresentationFullscreen({ renderAfter = true } = {}) {
   const fullscreenResult = app.fullscreenState.active
     ? { ok: true, code: "active" }
     : await fullscreenController.enter(elements.presentationView);
+
+  if (fullscreenResult.code === "install-required") {
+    showToast(
+      "No iPhone e no iPad, abra o app pela Tela de Início para usar sem as barras do navegador.",
+    );
+  }
 
   if (fullscreenResult.code === "unsupported") {
     showToast("Tela cheia indisponível neste navegador. Use a visualização normal.");
@@ -882,11 +903,15 @@ function getPresentationHeader(currentSectionLabel, nextSectionLabel, settings) 
 }
 
 function updateCapabilityChips() {
-  const fullscreenText = app.fullscreenState.active
-    ? "Tela cheia ativa"
-    : app.fullscreenState.supported
-      ? "Tela cheia pronta"
-      : "Tela cheia indisponível";
+  const fullscreenText = app.fullscreenState.standalone
+    ? "Aberto da tela inicial"
+    : app.fullscreenState.active
+      ? "Tela cheia ativa"
+      : app.fullscreenState.requestSupported
+        ? "Tela cheia pronta"
+        : app.fullscreenState.installHint === "ios-home-screen"
+          ? "Use a tela inicial no iPhone"
+          : "Tela cheia indisponível";
   const wakeLockText = app.wakeLockState.active
     ? "Wake lock ativo"
     : app.wakeLockState.supported
@@ -906,11 +931,13 @@ function updatePresentationControls(snapshot, canStart) {
   const shouldShowPause = sessionStatus === "running";
   const shouldShowResume = sessionStatus === "paused";
   const shouldShowReset = !(sessionStatus === "idle" && snapshot.totalElapsedMs === 0);
+  const shouldShowFullscreen = app.fullscreenState.requestSupported && !app.fullscreenState.standalone;
 
   elements.startButton.classList.toggle("hidden", !shouldShowStart);
   elements.pauseButton.classList.toggle("hidden", !shouldShowPause);
   elements.resumeButton.classList.toggle("hidden", !shouldShowResume);
   elements.resetButton.classList.toggle("hidden", !shouldShowReset);
+  elements.fullscreenButton.classList.toggle("hidden", !shouldShowFullscreen);
   elements.fullscreenButton.textContent = app.fullscreenState.active
     ? "Sair da tela cheia"
     : "Tela cheia";

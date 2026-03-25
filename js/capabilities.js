@@ -6,6 +6,49 @@ function isFullscreenEnabled(documentRef = document) {
   return Boolean(documentRef.fullscreenEnabled ?? documentRef.webkitFullscreenEnabled);
 }
 
+export function isAppleMobileDevice(navigatorRef = navigator) {
+  const userAgent = navigatorRef?.userAgent ?? "";
+  const platform = navigatorRef?.platform ?? "";
+  const maxTouchPoints = navigatorRef?.maxTouchPoints ?? 0;
+
+  return (
+    /iPhone|iPad|iPod/i.test(userAgent) ||
+    (platform === "MacIntel" && maxTouchPoints > 1)
+  );
+}
+
+export function isStandaloneDisplay(windowRef = window, navigatorRef = navigator) {
+  const standaloneMode =
+    typeof windowRef?.matchMedia === "function" &&
+    windowRef.matchMedia("(display-mode: standalone)").matches;
+  const fullscreenMode =
+    typeof windowRef?.matchMedia === "function" &&
+    windowRef.matchMedia("(display-mode: fullscreen)").matches;
+  const legacyStandalone = navigatorRef?.standalone === true;
+
+  return standaloneMode || fullscreenMode || legacyStandalone;
+}
+
+export function getFullscreenState({
+  documentRef = document,
+  windowRef = window,
+  navigatorRef = navigator,
+} = {}) {
+  const requestSupported = isFullscreenEnabled(documentRef);
+  const standalone = isStandaloneDisplay(windowRef, navigatorRef);
+
+  return {
+    supported: requestSupported || standalone,
+    active: standalone || Boolean(getFullscreenElement(documentRef)),
+    requestSupported,
+    standalone,
+    installHint:
+      !requestSupported && !standalone && isAppleMobileDevice(navigatorRef)
+        ? "ios-home-screen"
+        : null,
+  };
+}
+
 async function requestFullscreen(element) {
   if (typeof element.requestFullscreen === "function") {
     return element.requestFullscreen();
@@ -31,8 +74,10 @@ async function exitFullscreen(documentRef = document) {
 }
 
 export class FullscreenController {
-  constructor({ documentRef = document, onChange } = {}) {
+  constructor({ documentRef = document, windowRef = window, navigatorRef = navigator, onChange } = {}) {
     this.documentRef = documentRef;
+    this.windowRef = windowRef;
+    this.navigatorRef = navigatorRef;
     this.onChange = onChange;
 
     this.handleChange = this.handleChange.bind(this);
@@ -41,10 +86,11 @@ export class FullscreenController {
   }
 
   getState() {
-    return {
-      supported: isFullscreenEnabled(this.documentRef),
-      active: Boolean(getFullscreenElement(this.documentRef)),
-    };
+    return getFullscreenState({
+      documentRef: this.documentRef,
+      windowRef: this.windowRef,
+      navigatorRef: this.navigatorRef,
+    });
   }
 
   notify() {
@@ -56,10 +102,19 @@ export class FullscreenController {
   }
 
   async enter(element) {
-    if (!isFullscreenEnabled(this.documentRef)) {
+    const state = this.getState();
+
+    if (state.standalone) {
+      return {
+        ok: true,
+        code: "active",
+      };
+    }
+
+    if (!state.requestSupported) {
       return {
         ok: false,
-        code: "unsupported",
+        code: state.installHint ? "install-required" : "unsupported",
       };
     }
 
@@ -81,7 +136,16 @@ export class FullscreenController {
   }
 
   async exit() {
-    if (!this.getState().active) {
+    const state = this.getState();
+
+    if (state.standalone) {
+      return {
+        ok: true,
+        code: "standalone",
+      };
+    }
+
+    if (!state.active) {
       return {
         ok: true,
         code: "inactive",
@@ -106,7 +170,16 @@ export class FullscreenController {
   }
 
   async toggle(element) {
-    return this.getState().active ? this.exit() : this.enter(element);
+    const state = this.getState();
+
+    if (state.standalone) {
+      return {
+        ok: true,
+        code: "standalone",
+      };
+    }
+
+    return state.active ? this.exit() : this.enter(element);
   }
 }
 
