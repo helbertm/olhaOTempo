@@ -168,7 +168,6 @@ Cobertura atual de lógica:
 - transição para overtime
 - carga e salvamento em `localStorage`
 - fallback para armazenamento inválido
-- arredondamento dos modos de timer
 
 ## Limitações intencionais de v1
 
@@ -181,3 +180,21 @@ Não faz parte deste escopo:
 - vibração
 - colaboração em tempo real
 - importação/exportação
+
+## Próximas etapas
+
+Roadmap de evoluções desejadas:
+
+### Prioridade alta
+
+- [ ] exportação e importação das configurações em arquivo para manter backup ou enviar para outras pessoas
+- [ ] permitir trabalhar com mais de uma apresentação simultaneamente, salvando-as no `localStorage`
+
+### Prioridade média
+
+- [ ] usar recursos de áudio nos alertas
+- [ ] permitir mais personalizações dos alertas
+
+### Prioridade baixa
+
+- [ ] tradução da interface para outros idiomas
