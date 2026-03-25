@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>De olho no tempo</title>
+    <meta
+      name="description"
+      content="Cronômetro de palco com etapas, alertas visuais, persistência local, tela cheia e wake lock best effort."
+    />
+    <meta name="theme-color" content="#173530" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="./favicon.ico" sizes="any" />
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="./favicon.svg.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">
+            <img src="./favicon.svg" alt="" />
+          </div>
+          <div>
+            <h1 class="app-title">DE OLHO NO TEMPO</h1>
+            <p class="app-subtitle">
+              Configurações e etapas salvas apenas neste dispositivo.
+            </p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="reset-config-button" class="ghost-button" type="button">
+            Restaurar modelo
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <section id="config-view" class="mode-view">
+          <div class="panel-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <span id="storage-status" class="inline-status"></span>
+              </div>
+
+              <div class="field-stack">
+                <label class="field">
+                  <span>Título</span>
+                  <input
+                    id="presentation-title"
+                    type="text"
+                    maxlength="80"
+                    placeholder="Ex.: Keynote anual"
+                  />
+                </label>
+
+                <div class="config-switch-list">
+                  <section class="config-switch-item config-switch-item-theme">
+                    <div class="config-switch-copy">
+                      <strong>Tema da apresentação</strong>
+                    </div>
+                    <div id="theme-switch-group" class="theme-switch-group"></div>
+                    <select id="theme-select" class="hidden"></select>
+                  </section>
+
+                  <section class="config-switch-item">
+                    <div class="config-switch-copy">
+                      <strong>Tela cheia</strong>
+                    </div>
+                    <label class="switch-control">
+                      <input id="auto-fullscreen-enabled" type="checkbox" checked />
+                      <span class="switch-slider" aria-hidden="true"></span>
+                    </label>
+                  </section>
+
+                  <section class="config-switch-item">
+                    <div class="config-switch-copy">
+                      <strong>Tela ligada</strong>
+                    </div>
+                    <button
+                      id="config-wake-lock-button"
+                      class="switch-button"
+                      type="button"
+                      aria-pressed="false"
+                      aria-label="Tela ligada"
+                    >
+                      <span class="switch-slider" aria-hidden="true"></span>
+                    </button>
+                  </section>
+
+                  <section class="config-switch-item">
+                    <div class="config-switch-copy">
+                      <strong>Iniciar automaticamente</strong>
+                    </div>
+                    <label class="switch-control">
+                      <input id="auto-start-enabled" type="checkbox" />
+                      <span class="switch-slider" aria-hidden="true"></span>
+                    </label>
+                  </section>
+
+                  <section class="config-switch-item">
+                    <div class="config-switch-copy">
+                      <strong>Timer global</strong>
+                    </div>
+                    <label class="switch-control">
+                      <input id="show-presentation-timer" type="checkbox" checked />
+                      <span class="switch-slider" aria-hidden="true"></span>
+                    </label>
+                  </section>
+
+                  <section class="config-switch-item">
+                    <div class="config-switch-copy">
+                      <strong>Exibir etapa</strong>
+                    </div>
+                    <label class="switch-control">
+                      <input id="show-current-section" type="checkbox" checked />
+                      <span class="switch-slider" aria-hidden="true"></span>
+                    </label>
+                  </section>
+
+                  <section class="config-switch-item">
+                    <div class="config-switch-copy">
+                      <strong>Exibir próxima etapa</strong>
+                    </div>
+                    <label class="switch-control">
+                      <input id="show-next-section" type="checkbox" checked />
+                      <span class="switch-slider" aria-hidden="true"></span>
+                    </label>
+                  </section>
+
+                  <section class="config-switch-item">
+                    <div class="config-switch-copy">
+                      <strong>Duração automática</strong>
+                    </div>
+                    <label class="switch-control">
+                      <input id="manual-total-enabled" type="checkbox" />
+                      <span class="switch-slider" aria-hidden="true"></span>
+                    </label>
+                  </section>
+                </div>
+
+                <div id="manual-total-fields" class="duration-card">
+                  <p class="duration-card-title">Duração total planejada</p>
+                  <div class="duration-inputs duration-inputs-wide duration-inputs-three">
+                    <label>
+                      <span>Hora</span>
+                      <input id="total-hours" type="number" min="0" inputmode="numeric" />
+                    </label>
+                    <label>
+                      <span>Min</span>
+                      <input id="total-minutes" type="number" min="0" inputmode="numeric" />
+                    </label>
+                    <label>
+                      <span>Seg</span>
+                      <input
+                        id="total-seconds"
+                        type="number"
+                        min="0"
+                        max="59"
+                        inputmode="numeric"
+                      />
+                    </label>
+                  </div>
+                  <p id="manual-total-note" class="helper-text"></p>
+                </div>
+
+                <div class="summary-grid">
+                  <article class="summary-card">
+                    <span class="summary-label">Soma das etapas</span>
+                    <strong id="sections-total-value">00:00</strong>
+                  </article>
+                  <article class="summary-card">
+                    <span class="summary-label">Meta planejada</span>
+                    <strong id="configured-total-value">00:00</strong>
+                  </article>
+                </div>
+
+                <button id="open-presentation-button" class="primary-button summary-cta" type="button">
+                  Abrir modo apresentação
+                </button>
+              </div>
+            </section>
+
+            <section class="panel panel-wide">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-kicker">Roteiro</p>
+                  <h2 id="sections-panel-title">Etapas</h2>
+                </div>
+                <button id="add-section-button" class="secondary-button" type="button">
+                  Adicionar etapa
+                </button>
+              </div>
+
+              <p class="panel-copy">
+                Cada etapa aceita título, duração e até 3 alertas visuais por tempo decorrido dentro da própria etapa.
+              </p>
+
+              <div id="section-list" class="section-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="presentation-view" class="mode-view hidden" data-theme="stage-dark">
+          <div class="presentation-frame">
+            <header class="presentation-topbar">
+              <div class="presentation-meta sr-only">
+                <h2 id="presentation-title-display">De olho no tempo</h2>
+                <div class="status-chip-row">
+                  <span id="theme-chip" class="status-chip"></span>
+                  <span id="fullscreen-chip" class="status-chip"></span>
+                  <span id="wake-lock-chip" class="status-chip"></span>
+                  <span id="visibility-chip" class="status-chip"></span>
+                </div>
+              </div>
+
+              <div class="presentation-controls">
+                <button id="start-button" class="primary-button" type="button">Iniciar</button>
+                <button id="pause-button" class="secondary-button" type="button">Pausar</button>
+                <button id="resume-button" class="secondary-button" type="button">Retomar</button>
+                <button id="reset-button" class="ghost-button" type="button">Zerar</button>
+                <button id="fullscreen-button" class="ghost-button" type="button">
+                  Tela cheia
+                </button>
+                <button id="edit-mode-button" class="ghost-button" type="button">
+                  Voltar à edição
+                </button>
+              </div>
+            </header>
+
+            <section id="presentation-main" class="presentation-main">
+              <div class="presentation-copy">
+                <p id="mode-summary" class="mode-summary sr-only"></p>
+                <h3 id="current-section-title">Aguardando início</h3>
+              </div>
+
+              <div id="timer-stack" class="timer-stack" data-layout="dual">
+                <article class="timer-panel timer-panel-primary">
+                  <span id="section-timer-label" class="timer-label sr-only">Etapa</span>
+                  <strong id="section-timer-value" class="timer-value">00:00</strong>
+                </article>
+
+                <article id="total-timer-panel" class="timer-panel timer-panel-secondary">
+                  <span id="total-timer-label" class="timer-label sr-only">Total</span>
+                  <strong id="total-timer-value" class="timer-value">00:00</strong>
+                </article>
+              </div>
+            </section>
+
+            <section id="overtime-screen" class="overtime-screen hidden" aria-live="polite">
+              <p class="overtime-label sr-only">Tempo extra após o roteiro</p>
+              <strong id="overtime-value">-00:00</strong>
+              <p class="overtime-caption sr-only">
+                A última etapa terminou. O relógio abaixo mostra apenas o overtime total.
+              </p>
+            </section>
+
+            <p class="shortcut-hint sr-only">
+              Atalhos: barra de espaço inicia/pausa/retoma, F alterna tela cheia.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+    <template id="section-template">
+      <article class="section-card">
+        <header class="section-card-header">
+          <div>
+            <p class="section-order"></p>
+            <p class="section-duration-preview"></p>
+          </div>
+          <div class="section-card-actions">
+            <button class="icon-button move-up-button" type="button">Subir</button>
+            <button class="icon-button move-down-button" type="button">Descer</button>
+            <button class="icon-button danger-button remove-section-button" type="button">
+              Remover
+            </button>
+          </div>
+        </header>
+
+        <div class="field-grid field-grid-two">
+          <label class="field">
+            <span>Título da etapa</span>
+            <input class="section-title-input" type="text" maxlength="80" />
+          </label>
+
+          <div class="field">
+            <span>Duração da etapa</span>
+            <div class="duration-inputs">
+              <label>
+                <span>Min</span>
+                <input class="section-minutes-input" type="number" min="0" inputmode="numeric" />
+              </label>
+              <label>
+                <span>Seg</span>
+                <input
+                  class="section-seconds-input"
+                  type="number"
+                  min="0"
+                  max="59"
+                  inputmode="numeric"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <p class="section-warning hidden"></p>
+
+        <section class="alerts-block">
+          <div class="alerts-header">
+            <div>
+              <p class="meta-label">Alertas visuais da etapa</p>
+              <p class="helper-text">Cada alerta muda a cor e pisca pelo tempo configurado.</p>
+            </div>
+            <button class="secondary-button add-alert-button" type="button">
+              Adicionar alerta
+            </button>
+          </div>
+          <div class="alert-list"></div>
+        </section>
+      </article>
+    </template>
+
+    <template id="alert-template">
+      <div class="alert-row">
+        <div class="duration-inputs duration-inputs-compact">
+          <label>
+            <span>Min</span>
+            <input class="alert-minutes-input" type="number" min="0" inputmode="numeric" />
+          </label>
+          <label>
+            <span>Seg</span>
+            <input class="alert-seconds-input" type="number" min="0" max="59" inputmode="numeric" />
+          </label>
+          <label>
+            <span>Duração (seg)</span>
+            <input
+              class="alert-duration-input"
+              type="number"
+              min="5"
+              max="30"
+              inputmode="numeric"
+            />
+          </label>
+        </div>
+
+        <label class="field color-field">
+          <span>Cor</span>
+          <input class="alert-color-input" type="color" />
+        </label>
+
+        <button class="ghost-button remove-alert-button" type="button">Excluir</button>
+      </div>
+    </template>
+
+    <noscript>
+      <div class="noscript-message">
+        Este app precisa de JavaScript para salvar o roteiro, atualizar os timers e controlar tela cheia.
+      </div>
+    </noscript>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

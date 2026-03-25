@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">De olho no tempo</title>
+  <desc id="desc">Icone de tela de apresentacao com contagem de tempo sob controle.</desc>
+  <defs>
+    <linearGradient id="bg" x1="18" y1="12" x2="110" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#20443e"/>
+      <stop offset="0.55" stop-color="#173530"/>
+      <stop offset="1" stop-color="#102723"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="translate(44 26) rotate(42.5) scale(64 50)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="49" y1="40" x2="87" y2="66" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd77d"/>
+      <stop offset="1" stop-color="#f6a63a"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bg)"/>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#glow)"/>
+  <rect x="8.75" y="8.75" width="110.5" height="110.5" rx="27.25" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1.5"/>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M64 24v11" stroke="#f5fbf9" stroke-width="5"/>
+    <rect x="28" y="34" width="72" height="40" rx="13" stroke="#f5fbf9" stroke-width="5"/>
+    <path d="M64 74v16" stroke="#f5fbf9" stroke-width="5"/>
+    <path d="M49 94h30" stroke="#f5fbf9" stroke-width="5"/>
+
+    <circle cx="64" cy="54" r="15" stroke="#f5fbf9" stroke-opacity="0.22" stroke-width="5"/>
+    <path d="M64 39a15 15 0 0 1 12.8 7.2" stroke="url(#accent)" stroke-width="5"/>
+    <path d="M64 54V46" stroke="#f5fbf9" stroke-width="4.5"/>
+    <path d="M64 54l6.5 4" stroke="#f5fbf9" stroke-width="4.5"/>
+  </g>
+</svg>
