@@ -9,102 +9,29 @@ export function renderPresentation({
   app,
   elements,
   showToast,
-  syncRenderLoop,
 }) {
-  const { settings, runtime } = app.state;
-  const snapshot = derivePresentationSnapshot(settings, runtime.session, Date.now());
-  const theme = getThemeMeta(settings.themeId);
-  const currentSectionLabel = snapshot.currentSection
-    ? getSectionLabel(snapshot.currentSection, snapshot.currentSectionIndex)
-    : "Aguardando início";
-  const nextSectionLabel = snapshot.nextSection
-    ? getSectionLabel(snapshot.nextSection, snapshot.currentSectionIndex + 1)
-    : "Fim";
-  const presentationHeader = getPresentationHeader(
-    currentSectionLabel,
-    nextSectionLabel,
-    settings,
+  const snapshot = derivePresentationSnapshot(
+    app.state.settings,
+    app.state.runtime.session,
+    Date.now(),
   );
-  const sectionTimerMs = snapshot.currentSectionRemainingMs;
-  const totalTimerMs = snapshot.routeRemainingMs;
-  const activeAlert = snapshot.activeAlerts.at(-1) ?? null;
-  const shouldShowMain = !snapshot.isFinalOvertime;
-  const canStart = canStartPresentation(settings);
+  const viewModel = buildPresentationViewModel({ app, snapshot });
 
-  elements.presentationView.dataset.theme = theme.id;
-  elements.presentationView.dataset.session = runtime.session.status;
-  elements.presentationView.dataset.viewportMode = app.presentationViewportMode;
-  elements.presentationTitleDisplay.textContent =
-    settings.presentationTitle || "Apresentação sem título";
-  elements.themeChip.textContent = `Tema: ${theme.label}`;
-  elements.visibilityChip.textContent =
-    document.visibilityState === "visible" ? "Aba visível" : "Aba em segundo plano";
-  elements.modeSummary.textContent = "Contagem regressiva da etapa e do total.";
-
-  if (!canStart) {
-    const layoutMode = settings.showPresentationTimer ? "dual" : "single";
-    elements.presentationView.dataset.presentationState = "idle";
-    elements.presentationView.dataset.timerLayout = layoutMode;
-    elements.currentSectionTitle.textContent = presentationHeader || "Revise o roteiro";
-    elements.currentSectionTitle.classList.toggle("hidden", !presentationHeader);
-    elements.sectionTimerLabel.textContent = "Restante da etapa";
-    elements.sectionTimerValue.textContent = "00:00";
-    elements.sectionTimerValue.classList.remove("timer-value-alert");
-    elements.sectionTimerValue.style.removeProperty("--timer-alert-color");
-    elements.totalTimerLabel.textContent = "Restante do total";
-    elements.totalTimerValue.textContent = "00:00";
-    elements.presentationMain.dataset.layout = layoutMode;
-    elements.timerStack.dataset.layout = layoutMode;
-    elements.totalTimerPanel.classList.toggle("hidden", layoutMode === "single");
-    elements.presentationMain.classList.remove("hidden");
-    elements.overtimeScreen.classList.add("hidden");
-    updateCapabilityChips({ app, elements });
-    updatePresentationControls({ app, elements }, snapshot, canStart);
-    syncRenderLoop();
-    return;
-  }
-
-  elements.currentSectionTitle.textContent = presentationHeader;
-  elements.currentSectionTitle.classList.toggle("hidden", !presentationHeader);
-  elements.sectionTimerLabel.textContent = "Restante da etapa";
-  elements.totalTimerLabel.textContent = "Restante do total";
-  const isLastSection = Boolean(snapshot.currentSection) && !snapshot.nextSection;
-  const shouldShowGlobalTimer = settings.showPresentationTimer && !isLastSection;
-  const layoutMode = shouldShowGlobalTimer ? "dual" : "single";
-  elements.presentationView.dataset.presentationState = snapshot.isFinalOvertime
-    ? "overtime"
-    : layoutMode;
-  elements.presentationView.dataset.timerLayout = layoutMode;
-  elements.presentationMain.dataset.layout = layoutMode;
-  elements.timerStack.dataset.layout = layoutMode;
-  elements.totalTimerPanel.classList.toggle("hidden", !shouldShowGlobalTimer);
-  elements.sectionTimerValue.textContent = snapshot.currentSection
-    ? formatClockMilliseconds(sectionTimerMs, "countdown")
-    : "00:00";
-  elements.totalTimerValue.textContent = formatClockMilliseconds(totalTimerMs, "countdown");
-
-  elements.presentationMain.classList.toggle("hidden", !shouldShowMain);
-  elements.overtimeScreen.classList.toggle("hidden", shouldShowMain);
-
-  if (snapshot.isFinalOvertime) {
-    elements.overtimeValue.textContent = formatClockMilliseconds(
-      -snapshot.finalOvertimeMs,
-      "countdown",
-    );
-  }
-
-  if (activeAlert) {
-    elements.sectionTimerValue.classList.add("timer-value-alert");
-    elements.sectionTimerValue.style.setProperty("--timer-alert-color", activeAlert.color);
-  } else {
-    elements.sectionTimerValue.classList.remove("timer-value-alert");
-    elements.sectionTimerValue.style.removeProperty("--timer-alert-color");
-  }
-
-  updateCapabilityChips({ app, elements });
-  updatePresentationControls({ app, elements }, snapshot, canStart);
+  renderPresentationStructure({ app, elements }, viewModel);
+  renderPresentationClocks({ app, elements }, viewModel);
+  renderPresentationAlert({ app, elements }, viewModel);
   announcePresentationTransitions({ app, showToast }, snapshot);
-  syncRenderLoop();
+
+  return snapshot;
+}
+
+export function getNextPresentationUpdateDelay(snapshot) {
+  if (!snapshot) {
+    return 1000;
+  }
+
+  const remainder = snapshot.totalElapsedMs % 1000;
+  return remainder === 0 ? 1000 : 1000 - remainder;
 }
 
 export function getSectionLabel(section, index) {
@@ -125,45 +52,178 @@ export function getPresentationHeader(currentSectionLabel, nextSectionLabel, set
   return parts.join(" -> ");
 }
 
-function updateCapabilityChips({ app, elements }) {
-  const fullscreenText = app.fullscreenState.standalone
-    ? "Aberto da tela inicial"
-    : app.fullscreenState.active
-      ? "Tela cheia ativa"
-      : app.fullscreenState.requestSupported
-        ? "Tela cheia pronta"
-        : app.fullscreenState.installHint === "ios-home-screen"
-          ? "Use a tela inicial no iPhone"
-          : "Tela cheia indisponível";
-  const wakeLockText = app.wakeLockState.active
-    ? "Wake lock ativo"
-    : app.wakeLockState.supported
-      ? app.wakeLockState.shouldPersist
-        ? "Wake lock aguardando foco"
-        : "Wake lock pronto"
-      : "Wake lock indisponível";
+function buildPresentationViewModel({ app, snapshot }) {
+  const { settings, runtime } = app.state;
+  const theme = getThemeMeta(settings.themeId);
+  const currentSectionLabel = snapshot.currentSection
+    ? getSectionLabel(snapshot.currentSection, snapshot.currentSectionIndex)
+    : "Aguardando início";
+  const nextSectionLabel = snapshot.nextSection
+    ? getSectionLabel(snapshot.nextSection, snapshot.currentSectionIndex + 1)
+    : "Fim";
+  const headerText = getPresentationHeader(currentSectionLabel, nextSectionLabel, settings);
+  const canStart = canStartPresentation(settings);
+  const isLastSection = Boolean(snapshot.currentSection) && !snapshot.nextSection;
+  const showGlobalTimer = settings.showPresentationTimer && !isLastSection;
+  const layoutMode = showGlobalTimer ? "dual" : "single";
+  const activeAlert = snapshot.activeAlerts.at(-1) ?? null;
+  const controls = buildControlState({ app, snapshot, canStart });
+  const fullscreenText = getFullscreenChipText(app);
+  const wakeLockText = getWakeLockChipText(app);
+  const visibilityText =
+    document.visibilityState === "visible" ? "Aba visível" : "Aba em segundo plano";
+  const sectionTimerText = snapshot.currentSection
+    ? formatClockMilliseconds(snapshot.currentSectionRemainingMs, "countdown")
+    : "00:00";
+  const totalTimerText = canStart
+    ? formatClockMilliseconds(snapshot.routeRemainingMs, "countdown")
+    : "00:00";
+  const overtimeText = snapshot.isFinalOvertime
+    ? formatClockMilliseconds(-snapshot.finalOvertimeMs, "countdown")
+    : "";
 
-  elements.fullscreenChip.textContent = fullscreenText;
-  elements.wakeLockChip.textContent = wakeLockText;
+  return {
+    canStart,
+    themeId: theme.id,
+    sessionStatus: runtime.session.status,
+    viewportMode: app.presentationViewportMode,
+    titleText: settings.presentationTitle || "Apresentação sem título",
+    themeText: `Tema: ${theme.label}`,
+    visibilityText,
+    fullscreenText,
+    wakeLockText,
+    modeSummaryText: "Contagem regressiva da etapa e do total.",
+    headerText: canStart ? headerText : headerText || "Revise o roteiro",
+    showHeader: Boolean(headerText),
+    presentationState: snapshot.isFinalOvertime ? "overtime" : layoutMode,
+    layoutMode,
+    showMain: !snapshot.isFinalOvertime,
+    showOvertime: snapshot.isFinalOvertime,
+    showGlobalTimer,
+    sectionTimerText,
+    totalTimerText,
+    overtimeText,
+    alertColor: activeAlert?.color ?? "",
+    hasAlert: Boolean(activeAlert),
+    controls,
+  };
 }
 
-function updatePresentationControls({ app, elements }, snapshot, canStart) {
+function buildControlState({ app, snapshot, canStart }) {
   const sessionStatus = app.state.runtime.session.status;
 
-  const shouldShowStart = canStart && sessionStatus === "idle";
-  const shouldShowPause = sessionStatus === "running";
-  const shouldShowResume = sessionStatus === "paused";
-  const shouldShowReset = !(sessionStatus === "idle" && snapshot.totalElapsedMs === 0);
-  const shouldShowFullscreen = app.fullscreenState.requestSupported && !app.fullscreenState.standalone;
+  return {
+    showStart: canStart && sessionStatus === "idle",
+    showPause: sessionStatus === "running",
+    showResume: sessionStatus === "paused",
+    showReset: !(sessionStatus === "idle" && snapshot.totalElapsedMs === 0),
+    showFullscreen: app.fullscreenState.requestSupported && !app.fullscreenState.standalone,
+    fullscreenLabel: app.fullscreenState.active ? "Sair da tela cheia" : "Tela cheia",
+  };
+}
 
-  elements.startButton.classList.toggle("hidden", !shouldShowStart);
-  elements.pauseButton.classList.toggle("hidden", !shouldShowPause);
-  elements.resumeButton.classList.toggle("hidden", !shouldShowResume);
-  elements.resetButton.classList.toggle("hidden", !shouldShowReset);
-  elements.fullscreenButton.classList.toggle("hidden", !shouldShowFullscreen);
-  elements.fullscreenButton.textContent = app.fullscreenState.active
-    ? "Sair da tela cheia"
-    : "Tela cheia";
+function renderPresentationStructure({ app, elements }, viewModel) {
+  const structureKey = [
+    viewModel.themeId,
+    viewModel.sessionStatus,
+    viewModel.viewportMode,
+    viewModel.titleText,
+    viewModel.themeText,
+    viewModel.visibilityText,
+    viewModel.fullscreenText,
+    viewModel.wakeLockText,
+    viewModel.headerText,
+    viewModel.showHeader,
+    viewModel.presentationState,
+    viewModel.layoutMode,
+    viewModel.showMain,
+    viewModel.showOvertime,
+    viewModel.showGlobalTimer,
+    viewModel.controls.showStart,
+    viewModel.controls.showPause,
+    viewModel.controls.showResume,
+    viewModel.controls.showReset,
+    viewModel.controls.showFullscreen,
+    viewModel.controls.fullscreenLabel,
+  ].join("|");
+
+  if (app.presentationRenderCache.structureKey === structureKey) {
+    return;
+  }
+
+  app.presentationRenderCache.structureKey = structureKey;
+
+  elements.presentationView.dataset.theme = viewModel.themeId;
+  elements.presentationView.dataset.session = viewModel.sessionStatus;
+  elements.presentationView.dataset.viewportMode = viewModel.viewportMode;
+  elements.presentationView.dataset.presentationState = viewModel.presentationState;
+  elements.presentationView.dataset.timerLayout = viewModel.layoutMode;
+  elements.presentationMain.dataset.layout = viewModel.layoutMode;
+  elements.timerStack.dataset.layout = viewModel.layoutMode;
+
+  applyText(elements.presentationTitleDisplay, viewModel.titleText);
+  applyText(elements.themeChip, viewModel.themeText);
+  applyText(elements.visibilityChip, viewModel.visibilityText);
+  applyText(elements.fullscreenChip, viewModel.fullscreenText);
+  applyText(elements.wakeLockChip, viewModel.wakeLockText);
+  applyText(elements.modeSummary, viewModel.modeSummaryText);
+  applyText(elements.currentSectionTitle, viewModel.headerText);
+  applyText(elements.sectionTimerLabel, "Restante da etapa");
+  applyText(elements.totalTimerLabel, "Restante do total");
+  applyHidden(elements.currentSectionTitle, !viewModel.showHeader);
+  applyHidden(elements.totalTimerPanel, !viewModel.showGlobalTimer);
+  applyHidden(elements.presentationMain, !viewModel.showMain);
+  applyHidden(elements.overtimeScreen, !viewModel.showOvertime);
+
+  updatePresentationControls(elements, viewModel.controls);
+}
+
+function renderPresentationClocks({ app, elements }, viewModel) {
+  if (app.presentationRenderCache.sectionTimerText !== viewModel.sectionTimerText) {
+    applyText(elements.sectionTimerValue, viewModel.sectionTimerText);
+    app.presentationRenderCache.sectionTimerText = viewModel.sectionTimerText;
+  }
+
+  if (app.presentationRenderCache.totalTimerText !== viewModel.totalTimerText) {
+    applyText(elements.totalTimerValue, viewModel.totalTimerText);
+    app.presentationRenderCache.totalTimerText = viewModel.totalTimerText;
+  }
+
+  if (viewModel.showOvertime && app.presentationRenderCache.overtimeText !== viewModel.overtimeText) {
+    applyText(elements.overtimeValue, viewModel.overtimeText);
+    app.presentationRenderCache.overtimeText = viewModel.overtimeText;
+  }
+
+  if (!viewModel.showOvertime && app.presentationRenderCache.overtimeText) {
+    app.presentationRenderCache.overtimeText = "";
+  }
+}
+
+function renderPresentationAlert({ app, elements }, viewModel) {
+  const alertKey = `${viewModel.hasAlert ? "active" : "idle"}|${viewModel.alertColor}`;
+
+  if (app.presentationRenderCache.alertKey === alertKey) {
+    return;
+  }
+
+  app.presentationRenderCache.alertKey = alertKey;
+
+  if (viewModel.hasAlert) {
+    elements.sectionTimerValue.classList.add("timer-value-alert");
+    elements.sectionTimerValue.style.setProperty("--timer-alert-color", viewModel.alertColor);
+  } else {
+    elements.sectionTimerValue.classList.remove("timer-value-alert");
+    elements.sectionTimerValue.style.removeProperty("--timer-alert-color");
+  }
+}
+
+function updatePresentationControls(elements, controls) {
+  applyHidden(elements.startButton, !controls.showStart);
+  applyHidden(elements.pauseButton, !controls.showPause);
+  applyHidden(elements.resumeButton, !controls.showResume);
+  applyHidden(elements.resetButton, !controls.showReset);
+  applyHidden(elements.fullscreenButton, !controls.showFullscreen);
+  applyText(elements.fullscreenButton, controls.fullscreenLabel);
 }
 
 function announcePresentationTransitions({ app, showToast }, snapshot) {
@@ -191,4 +251,48 @@ function announcePresentationTransitions({ app, showToast }, snapshot) {
 
   app.lastRenderedSectionId = snapshot.currentSection?.id ?? null;
   app.lastOvertimeState = snapshot.isFinalOvertime;
+}
+
+function getFullscreenChipText(app) {
+  if (app.fullscreenState.standalone) {
+    return "Aberto da tela inicial";
+  }
+
+  if (app.fullscreenState.active) {
+    return "Tela cheia ativa";
+  }
+
+  if (app.fullscreenState.requestSupported) {
+    return "Tela cheia pronta";
+  }
+
+  if (app.fullscreenState.installHint === "ios-home-screen") {
+    return "Use a tela inicial no iPhone";
+  }
+
+  return "Tela cheia indisponível";
+}
+
+function getWakeLockChipText(app) {
+  if (app.wakeLockState.active) {
+    return "Wake lock ativo";
+  }
+
+  if (!app.wakeLockState.supported) {
+    return "Wake lock indisponível";
+  }
+
+  return app.wakeLockState.shouldPersist
+    ? "Wake lock aguardando foco"
+    : "Wake lock pronto";
+}
+
+function applyText(node, value) {
+  if (node.textContent !== value) {
+    node.textContent = value;
+  }
+}
+
+function applyHidden(node, hidden) {
+  node.classList.toggle("hidden", hidden);
 }

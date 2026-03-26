@@ -27,7 +27,10 @@ import {
   startPresentationSession as startPresentationSessionAction,
   updatePresentationViewportMode as updatePresentationViewportModeAction,
 } from "./presentation-controls.js";
-import { renderPresentation as renderPresentationUi } from "./presentation-ui.js";
+import {
+  getNextPresentationUpdateDelay,
+  renderPresentation as renderPresentationUi,
+} from "./presentation-ui.js";
 import {
   handleAddSection as handleAddSectionAction,
   handleSectionListClick as handleSectionListClickAction,
@@ -51,7 +54,8 @@ const app = {
   state: loadResult.state,
   loadStatus: loadResult.status,
   saveStatus: "idle",
-  frameId: 0,
+  renderTimerId: 0,
+  lastPresentationSnapshot: null,
   lastRenderedSectionId: null,
   lastOvertimeState: false,
   wasHidden: document.visibilityState === "hidden",
@@ -69,6 +73,13 @@ const app = {
     code: "inactive",
   },
   presentationViewportMode: "desktop",
+  presentationRenderCache: {
+    structureKey: "",
+    sectionTimerText: "",
+    totalTimerText: "",
+    overtimeText: "",
+    alertKey: "",
+  },
 };
 
 const fullscreenController = new FullscreenController({
@@ -130,12 +141,15 @@ function updateConfigDocumentTitle() {
 }
 
 function renderPresentationView() {
-  renderPresentationUi({
+  const snapshot = renderPresentationUi({
     app,
     elements,
     showToast: showToastMessage,
-    syncRenderLoop,
   });
+
+  app.lastPresentationSnapshot = snapshot;
+  syncRenderLoop();
+  return snapshot;
 }
 
 function persistAppState() {
@@ -455,31 +469,26 @@ function syncRenderLoop() {
 }
 
 function startRenderLoop() {
-  if (app.frameId) {
+  if (!app.lastPresentationSnapshot) {
+    renderPresentationView();
     return;
   }
 
-  const tick = () => {
+  if (app.renderTimerId) {
+    window.clearTimeout(app.renderTimerId);
+  }
+
+  app.renderTimerId = window.setTimeout(() => {
+    app.renderTimerId = 0;
     renderPresentationView();
-
-    if (
-      app.state.runtime.view === "presentation" &&
-      app.state.runtime.session.status === "running"
-    ) {
-      app.frameId = window.requestAnimationFrame(tick);
-    } else {
-      app.frameId = 0;
-    }
-  };
-
-  app.frameId = window.requestAnimationFrame(tick);
+  }, getNextPresentationUpdateDelay(app.lastPresentationSnapshot));
 }
 
 function stopRenderLoop() {
-  if (!app.frameId) {
+  if (!app.renderTimerId) {
     return;
   }
 
-  window.cancelAnimationFrame(app.frameId);
-  app.frameId = 0;
+  window.clearTimeout(app.renderTimerId);
+  app.renderTimerId = 0;
 }
