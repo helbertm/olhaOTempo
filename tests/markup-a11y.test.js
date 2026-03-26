@@ -20,6 +20,8 @@ test("markup principal preserva semantica critica de acessibilidade", () => {
   assert.match(html, /id="total-timer-value"[\s\S]*role="timer"[\s\S]*aria-live="off"/);
   assert.match(html, /id="overtime-value"[\s\S]*role="timer"[\s\S]*aria-live="off"/);
   assert.match(html, /id="back-to-top-button"[\s\S]*aria-label="Voltar ao topo"/);
+  assert.match(html, /class="app-beta-badge">BETA</);
+  assert.match(html, /class="app-beta-note">Versão beta\./);
 });
 
 test("switches possuem rotulo visual ligado semanticamente ao checkbox", () => {

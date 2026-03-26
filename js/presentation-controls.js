@@ -43,6 +43,7 @@ export async function openPresentationMode({
 
   setView("presentation");
   renderPresentation();
+  showToast("Versão beta: valide fullscreen, wake lock e timers no seu dispositivo antes de usar em palco.");
 
   if (app.state.settings.autoStartOnOpen) {
     startPresentationSession();

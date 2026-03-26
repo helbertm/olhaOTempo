@@ -222,12 +222,41 @@ h3 {
   text-wrap: balance;
 }
 
+.app-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.app-beta-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.28rem 0.62rem;
+  border-radius: 999px;
+  background: rgba(180, 83, 9, 0.12);
+  border: 1px solid rgba(180, 83, 9, 0.18);
+  color: var(--warning);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .app-subtitle,
 .panel-copy,
 .helper-text,
 .shortcut-hint {
   color: var(--text-muted);
   line-height: 1.5;
+}
+
+.app-beta-note {
+  margin-top: var(--space-2);
+  color: var(--warning);
+  font-size: var(--type-body-sm);
+  line-height: 1.45;
 }
 
 .platform-note {
