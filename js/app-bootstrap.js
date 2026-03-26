@@ -41,6 +41,7 @@ export function attachEventListeners({ elements, handlers }) {
   elements.themeSwitchGroup.addEventListener("click", handlers.handleThemeSwitchClick);
   elements.themeSwitchGroup.addEventListener("keydown", handlers.handleThemeSwitchKeydown);
   elements.resetConfigButton.addEventListener("click", handlers.handleResetConfig);
+  elements.backToTopButton.addEventListener("click", handlers.handleBackToTopClick);
 
   elements.configView.addEventListener("input", handlers.handleConfigInput);
   elements.configView.addEventListener("change", handlers.handleConfigChange);
@@ -53,6 +54,7 @@ export function attachEventListeners({ elements, handlers }) {
   elements.fullscreenButton.addEventListener("click", handlers.handleToggleFullscreen);
   elements.editModeButton.addEventListener("click", handlers.handleReturnToEditMode);
 
+  window.addEventListener("scroll", handlers.handleWindowScroll, { passive: true });
   window.addEventListener("resize", handlers.handleViewportChange, { passive: true });
   window.visualViewport?.addEventListener("resize", handlers.handleViewportChange);
   document.addEventListener("visibilitychange", handlers.handleVisibilityChange);

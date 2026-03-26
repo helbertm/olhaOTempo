@@ -1,4 +1,7 @@
 import {
+  createBackToTopController,
+} from "./back-to-top.js";
+import {
   FullscreenController,
   WakeLockController,
 } from "./capabilities.js";
@@ -88,6 +91,12 @@ const fullscreenController = new FullscreenController({
 const wakeLockController = new WakeLockController({
   onChange: handleWakeLockChange,
 });
+const backToTopController = createBackToTopController({
+  app,
+  elements,
+  windowRef: window,
+  documentRef: document,
+});
 
 app.fullscreenState = fullscreenController.getState();
 app.wakeLockState = wakeLockController.getState();
@@ -113,6 +122,7 @@ attachEventListeners({
     handleThemeSwitchClick,
     handleThemeSwitchKeydown,
     handleResetConfig,
+    handleBackToTopClick,
     handleConfigInput,
     handleConfigChange,
     handleSectionListClick,
@@ -122,6 +132,7 @@ attachEventListeners({
     handleResetPresentation,
     handleToggleFullscreen,
     handleReturnToEditMode,
+    handleWindowScroll,
     handleViewportChange,
     handleVisibilityChange,
     handlePresentationShortcuts,
@@ -130,6 +141,7 @@ attachEventListeners({
 
 function renderConfigView() {
   renderConfigUi({ app, elements });
+  backToTopController.update();
 }
 
 function refreshConfigViewSummary() {
@@ -148,6 +160,7 @@ function renderPresentationView() {
   });
 
   app.lastPresentationSnapshot = snapshot;
+  backToTopController.update();
   syncRenderLoop();
   return snapshot;
 }
@@ -173,6 +186,7 @@ function handleViewportChange() {
     elements,
     renderPresentation: renderPresentationView,
   });
+  backToTopController.update();
 }
 
 function setCurrentView(view, options) {
@@ -186,6 +200,15 @@ function setCurrentView(view, options) {
     view,
     options,
   );
+  backToTopController.update();
+}
+
+function handleWindowScroll() {
+  backToTopController.handleScroll();
+}
+
+function handleBackToTopClick() {
+  backToTopController.scrollToTop();
 }
 
 function ensureFullscreen(options) {

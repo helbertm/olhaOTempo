@@ -9,6 +9,7 @@ const REQUIRED_PATTERNS = [
   /id="section-timer-value"[\s\S]*role="timer"[\s\S]*aria-live="off"/,
   /id="total-timer-value"[\s\S]*role="timer"[\s\S]*aria-live="off"/,
   /id="overtime-value"[\s\S]*role="timer"[\s\S]*aria-live="off"/,
+  /id="back-to-top-button"[\s\S]*aria-label="Voltar ao topo"/,
 ];
 const REQUIRED_SWITCHES = [
   ["auto-fullscreen-enabled", "auto-fullscreen-label"],

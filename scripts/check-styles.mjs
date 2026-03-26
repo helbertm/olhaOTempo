@@ -12,6 +12,7 @@ const REQUIRED_TOKENS = [
   '[data-content-layout="split"]',
   '[data-controls-layout="compact-grid"]',
   '[data-title-density="tight"]',
+  ".back-to-top-button",
 ];
 
 for (const token of REQUIRED_TOKENS) {
