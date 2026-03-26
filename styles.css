@@ -452,33 +452,69 @@ main {
   padding: 0;
 }
 
-.settings-disclosure summary {
+.settings-disclosure summary,
+.alerts-disclosure summary {
   cursor: pointer;
   list-style: none;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-4);
+  color: var(--text-main);
+}
+
+.settings-disclosure summary {
   align-self: start;
   padding: 0.72rem 1rem;
   border-radius: var(--control-pill-radius);
   border: 1px solid rgba(24, 32, 33, 0.1);
   background: rgba(255, 255, 255, 0.6);
-  color: var(--text-main);
   font-weight: 600;
 }
 
-.settings-disclosure summary::-webkit-details-marker {
+.settings-disclosure summary:hover,
+.alerts-disclosure summary:hover {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.settings-disclosure summary:focus-visible,
+.alerts-disclosure summary:focus-visible {
+  outline: none;
+  box-shadow: var(--state-focus-ring);
+}
+
+.settings-disclosure summary::-webkit-details-marker,
+.alerts-disclosure summary::-webkit-details-marker {
   display: none;
 }
 
-.settings-disclosure summary::before {
-  content: "+";
-  font-size: 1rem;
-  line-height: 1;
+.settings-disclosure summary::after,
+.alerts-disclosure summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 0.58rem;
+  height: 0.58rem;
+  margin-left: auto;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  color: var(--text-soft);
+  opacity: 0.84;
+  transform: rotate(45deg);
+  transform-origin: center;
+  transition:
+    transform 160ms ease,
+    opacity 160ms ease;
 }
 
-.settings-disclosure[open] summary::before {
-  content: "-";
+.settings-disclosure[open] summary::after,
+.alerts-disclosure[open] summary::after {
+  transform: rotate(-135deg);
+}
+
+.settings-disclosure summary:hover::after,
+.alerts-disclosure summary:hover::after,
+.settings-disclosure summary:focus-visible::after,
+.alerts-disclosure summary:focus-visible::after {
+  opacity: 1;
 }
 
 .settings-disclosure-body {
@@ -815,39 +851,8 @@ main {
 }
 
 .alerts-disclosure summary {
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
   padding: 16px;
-  color: var(--text-main);
-}
-
-.alerts-disclosure summary:hover {
-  background: rgba(255, 255, 255, 0.42);
-}
-
-.alerts-disclosure summary:focus-visible {
-  outline: none;
-  box-shadow: inset var(--state-focus-ring);
-}
-
-.alerts-disclosure summary::-webkit-details-marker {
-  display: none;
-}
-
-.alerts-disclosure summary::after {
-  content: "+";
-  flex: 0 0 auto;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--text-soft);
-}
-
-.alerts-disclosure[open] summary::after {
-  content: "-";
 }
 
 .alerts-summary-copy {
