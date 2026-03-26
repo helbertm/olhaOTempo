@@ -13,6 +13,7 @@ import {
   parseHoursMinutesSeconds,
   parseMinutesSeconds,
 } from "./time.js";
+import { getSelectedThemeId } from "./ui-config.js";
 
 export function syncSettingsFromDom({
   app,
@@ -53,7 +54,7 @@ export function serializeSettingsFromDom({ app, elements }) {
 
   return {
     presentationTitle: elements.presentationTitle.value.trim(),
-    themeId: elements.themeSelect.value,
+    themeId: getSelectedThemeId(elements),
     autoFullscreen: elements.autoFullscreenEnabled.checked,
     keepScreenAwake: elements.keepScreenAwakeEnabled.checked,
     autoStartOnOpen: elements.autoStartEnabled.checked,

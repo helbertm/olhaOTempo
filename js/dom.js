@@ -3,7 +3,6 @@ export const elements = {
   presentationView: document.querySelector("#presentation-view"),
   keepScreenAwakeEnabled: document.querySelector("#keep-screen-awake-enabled"),
   presentationTitle: document.querySelector("#presentation-title"),
-  themeSelect: document.querySelector("#theme-select"),
   themeSwitchGroup: document.querySelector("#theme-switch-group"),
   autoFullscreenEnabled: document.querySelector("#auto-fullscreen-enabled"),
   autoStartEnabled: document.querySelector("#auto-start-enabled"),

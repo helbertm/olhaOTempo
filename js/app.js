@@ -40,6 +40,7 @@ import {
 import { loadPersistedState } from "./storage.js";
 import { resetSession } from "./timer-engine.js";
 import {
+  getSelectedThemeId,
   populateStaticOptions,
   refreshConfigSummary,
   renderConfig as renderConfigUi,
@@ -262,8 +263,8 @@ function handleThemeSwitchClick(event) {
   if (themeButton instanceof HTMLButtonElement) {
     const nextThemeId = themeButton.dataset.themeChoice;
 
-    if (nextThemeId && nextThemeId !== elements.themeSelect.value) {
-      elements.themeSelect.value = nextThemeId;
+    if (nextThemeId && nextThemeId !== getSelectedThemeId(elements)) {
+      updateThemeSwitchGroup(elements, nextThemeId);
       syncSettingsFromDom({
         app,
         elements,
@@ -331,8 +332,8 @@ function handleThemeSwitchKeydown(event) {
 
   nextButton.focus();
 
-  if (nextThemeId !== elements.themeSelect.value) {
-    elements.themeSelect.value = nextThemeId;
+  if (nextThemeId !== getSelectedThemeId(elements)) {
+    updateThemeSwitchGroup(elements, nextThemeId);
     syncSettingsFromDom({
       app,
       elements,

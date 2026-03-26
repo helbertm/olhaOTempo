@@ -16,9 +16,6 @@ import {
 } from "./time.js";
 
 export function populateStaticOptions(elements) {
-  elements.themeSelect.innerHTML = THEME_OPTIONS.map(
-    (theme) => `<option value="${theme.id}">${theme.label}</option>`,
-  ).join("");
   elements.themeSwitchGroup.innerHTML = THEME_OPTIONS.map(
     (theme) => `
       <button
@@ -47,7 +44,6 @@ export function renderConfig({ app, elements }) {
   const manualTotalParts = splitHoursMinutesSeconds(settings.totalManualSeconds);
 
   elements.presentationTitle.value = settings.presentationTitle;
-  elements.themeSelect.value = settings.themeId;
   elements.autoFullscreenEnabled.checked = settings.autoFullscreen;
   elements.autoStartEnabled.checked = settings.autoStartOnOpen;
   elements.keepScreenAwakeEnabled.checked = settings.keepScreenAwake;
@@ -70,6 +66,16 @@ export function renderConfig({ app, elements }) {
   refreshConfigSummary({ app, elements });
   updateDocumentTitle({ app, elements });
   updateThemeSwitchGroup(elements, settings.themeId);
+}
+
+export function getSelectedThemeId(elements) {
+  const activeThemeId = elements.themeSwitchGroup.dataset.activeTheme;
+
+  if (activeThemeId) {
+    return activeThemeId;
+  }
+
+  return THEME_OPTIONS[0].id;
 }
 
 function createSectionCard({ app, elements }, section, index) {
@@ -207,6 +213,7 @@ export function getStorageStatusMeta({ loadStatus, saveStatus }) {
 
 export function updateThemeSwitchGroup(elements, activeThemeId) {
   const themeButtons = elements.themeSwitchGroup.querySelectorAll("[data-theme-choice]");
+  elements.themeSwitchGroup.dataset.activeTheme = activeThemeId;
 
   for (const themeButton of themeButtons) {
     const isActive = themeButton.dataset.themeChoice === activeThemeId;
