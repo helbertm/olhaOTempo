@@ -50,18 +50,23 @@
                 <span id="storage-status" class="inline-status"></span>
               </div>
 
-              <div class="field-stack">
-                <label class="field">
-                  <span>Título</span>
-                  <input
-                    id="presentation-title"
-                    type="text"
-                    maxlength="80"
-                    placeholder="Ex.: Keynote anual"
-                  />
-                </label>
+              <div class="field-stack settings-stack">
+                <section class="settings-group">
+                  <div class="settings-group-heading">
+                    <p class="panel-kicker">Apresentação</p>
+                    <p class="settings-group-title">Base do roteiro</p>
+                  </div>
 
-                <div class="config-switch-list">
+                  <label class="field">
+                    <span>Título</span>
+                    <input
+                      id="presentation-title"
+                      type="text"
+                      maxlength="80"
+                      placeholder="Ex.: Keynote anual"
+                    />
+                  </label>
+
                   <section class="config-switch-item config-switch-item-theme">
                     <div class="config-switch-copy">
                       <strong>Tema da apresentação</strong>
@@ -73,66 +78,62 @@
                       aria-label="Tema da apresentação"
                     ></div>
                   </section>
+                </section>
 
-                  <section class="config-switch-item">
-                    <div class="config-switch-copy">
-                      <strong>Tela cheia</strong>
-                    </div>
-                    <label class="switch-control">
-                      <input id="auto-fullscreen-enabled" type="checkbox" checked />
-                      <span class="switch-slider" aria-hidden="true"></span>
-                    </label>
-                  </section>
+                <section class="settings-group">
+                  <div class="settings-group-heading">
+                    <p class="panel-kicker">Exibição</p>
+                    <p class="settings-group-title">Como a apresentação aparece em cena</p>
+                  </div>
 
-                  <section class="config-switch-item">
-                    <div class="config-switch-copy">
-                      <strong>Tela ligada</strong>
-                    </div>
-                    <label class="switch-control">
-                      <input id="keep-screen-awake-enabled" type="checkbox" />
-                      <span class="switch-slider" aria-hidden="true"></span>
-                    </label>
-                  </section>
+                  <div class="config-switch-list">
+                    <section class="config-switch-item">
+                      <div class="config-switch-copy">
+                        <strong>Tela cheia</strong>
+                      </div>
+                      <label class="switch-control">
+                        <input id="auto-fullscreen-enabled" type="checkbox" checked />
+                        <span class="switch-slider" aria-hidden="true"></span>
+                      </label>
+                    </section>
 
-                  <section class="config-switch-item">
-                    <div class="config-switch-copy">
-                      <strong>Iniciar automaticamente</strong>
-                    </div>
-                    <label class="switch-control">
-                      <input id="auto-start-enabled" type="checkbox" />
-                      <span class="switch-slider" aria-hidden="true"></span>
-                    </label>
-                  </section>
+                    <section class="config-switch-item">
+                      <div class="config-switch-copy">
+                        <strong>Timer global</strong>
+                      </div>
+                      <label class="switch-control">
+                        <input id="show-presentation-timer" type="checkbox" checked />
+                        <span class="switch-slider" aria-hidden="true"></span>
+                      </label>
+                    </section>
 
-                  <section class="config-switch-item">
-                    <div class="config-switch-copy">
-                      <strong>Timer global</strong>
-                    </div>
-                    <label class="switch-control">
-                      <input id="show-presentation-timer" type="checkbox" checked />
-                      <span class="switch-slider" aria-hidden="true"></span>
-                    </label>
-                  </section>
+                    <section class="config-switch-item">
+                      <div class="config-switch-copy">
+                        <strong>Exibir etapa</strong>
+                      </div>
+                      <label class="switch-control">
+                        <input id="show-current-section" type="checkbox" checked />
+                        <span class="switch-slider" aria-hidden="true"></span>
+                      </label>
+                    </section>
 
-                  <section class="config-switch-item">
-                    <div class="config-switch-copy">
-                      <strong>Exibir etapa</strong>
-                    </div>
-                    <label class="switch-control">
-                      <input id="show-current-section" type="checkbox" checked />
-                      <span class="switch-slider" aria-hidden="true"></span>
-                    </label>
-                  </section>
+                    <section class="config-switch-item">
+                      <div class="config-switch-copy">
+                        <strong>Exibir próxima etapa</strong>
+                      </div>
+                      <label class="switch-control">
+                        <input id="show-next-section" type="checkbox" checked />
+                        <span class="switch-slider" aria-hidden="true"></span>
+                      </label>
+                    </section>
+                  </div>
+                </section>
 
-                  <section class="config-switch-item">
-                    <div class="config-switch-copy">
-                      <strong>Exibir próxima etapa</strong>
-                    </div>
-                    <label class="switch-control">
-                      <input id="show-next-section" type="checkbox" checked />
-                      <span class="switch-slider" aria-hidden="true"></span>
-                    </label>
-                  </section>
+                <section class="settings-group">
+                  <div class="settings-group-heading">
+                    <p class="panel-kicker">Total planejado</p>
+                    <p class="settings-group-title">Referência de duração da apresentação</p>
+                  </div>
 
                   <section class="config-switch-item">
                     <div class="config-switch-copy">
@@ -143,52 +144,87 @@
                       <span class="switch-slider" aria-hidden="true"></span>
                     </label>
                   </section>
-                </div>
 
-                <p id="ios-fullscreen-note" class="helper-text platform-note hidden">
-                  No iPhone e no iPad, para abrir sem as barras do navegador use Compartilhar
-                  > Adicionar à Tela de Início e abra o app pelo ícone instalado.
-                </p>
-
-                <div id="manual-total-fields" class="duration-card">
-                  <p class="duration-card-title">Duração total planejada</p>
-                  <div class="duration-inputs duration-inputs-wide duration-inputs-three">
-                    <label>
-                      <span>Hora</span>
-                      <input id="total-hours" type="number" min="0" inputmode="numeric" />
-                    </label>
-                    <label>
-                      <span>Min</span>
-                      <input id="total-minutes" type="number" min="0" inputmode="numeric" />
-                    </label>
-                    <label>
-                      <span>Seg</span>
-                      <input
-                        id="total-seconds"
-                        type="number"
-                        min="0"
-                        max="59"
-                        inputmode="numeric"
-                      />
-                    </label>
+                  <div id="manual-total-fields" class="duration-card">
+                    <p class="duration-card-title">Duração total planejada</p>
+                    <div class="duration-inputs duration-inputs-wide duration-inputs-three">
+                      <label>
+                        <span>Hora</span>
+                        <input id="total-hours" type="number" min="0" inputmode="numeric" />
+                      </label>
+                      <label>
+                        <span>Min</span>
+                        <input id="total-minutes" type="number" min="0" inputmode="numeric" />
+                      </label>
+                      <label>
+                        <span>Seg</span>
+                        <input
+                          id="total-seconds"
+                          type="number"
+                          min="0"
+                          max="59"
+                          inputmode="numeric"
+                        />
+                      </label>
+                    </div>
+                    <p id="manual-total-note" class="helper-text"></p>
                   </div>
-                  <p id="manual-total-note" class="helper-text"></p>
-                </div>
 
-                <div class="summary-grid">
-                  <article class="summary-card">
-                    <span class="summary-label">Soma das etapas</span>
-                    <strong id="sections-total-value">00:00</strong>
-                  </article>
-                  <article class="summary-card">
-                    <span class="summary-label">Meta planejada</span>
-                    <strong id="configured-total-value">00:00</strong>
-                  </article>
-                </div>
+                  <div class="summary-grid">
+                    <article class="summary-card">
+                      <span class="summary-label">Soma das etapas</span>
+                      <strong id="sections-total-value">00:00</strong>
+                    </article>
+                    <article class="summary-card">
+                      <span class="summary-label">Meta planejada</span>
+                      <strong id="configured-total-value">00:00</strong>
+                    </article>
+                  </div>
 
-                <button id="open-presentation-button" class="primary-button summary-cta" type="button">
-                  Abrir modo apresentação
-                </button>
+                  <button id="open-presentation-button" class="primary-button summary-cta" type="button">
+                    Abrir modo apresentação
+                  </button>
+                </section>
+
+                <details class="settings-disclosure">
+                  <summary>Opções avançadas</summary>
+
+                  <div class="settings-disclosure-body">
+                    <section class="settings-group">
+                      <div class="settings-group-heading">
+                        <p class="panel-kicker">Dispositivo</p>
+                        <p class="settings-group-title">Preferências do aparelho e da abertura</p>
+                      </div>
+
+                      <div class="config-switch-list">
+                        <section class="config-switch-item">
+                          <div class="config-switch-copy">
+                            <strong>Tela ligada</strong>
+                          </div>
+                          <label class="switch-control">
+                            <input id="keep-screen-awake-enabled" type="checkbox" />
+                            <span class="switch-slider" aria-hidden="true"></span>
+                          </label>
+                        </section>
+
+                        <section class="config-switch-item">
+                          <div class="config-switch-copy">
+                            <strong>Iniciar automaticamente</strong>
+                          </div>
+                          <label class="switch-control">
+                            <input id="auto-start-enabled" type="checkbox" />
+                            <span class="switch-slider" aria-hidden="true"></span>
+                          </label>
+                        </section>
+                      </div>
+
+                      <p id="ios-fullscreen-note" class="helper-text platform-note hidden">
+                        No iPhone e no iPad, para abrir sem as barras do navegador use Compartilhar
+                        > Adicionar à Tela de Início e abra o app pelo ícone instalado.
+                      </p>
+                    </section>
+                  </div>
+                </details>
               </div>
             </section>
 

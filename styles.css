@@ -362,16 +362,80 @@ main {
 .summary-card,
 .overtime-screen {
   display: grid;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .field-grid {
   display: grid;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .field-grid-two {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.settings-stack {
+  gap: var(--space-5);
+}
+
+.settings-group {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--panel-padding-sm);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(24, 32, 33, 0.08);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.settings-group-heading {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.settings-group-title {
+  font-size: var(--type-body-sm);
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.settings-disclosure {
+  display: grid;
+  gap: var(--space-4);
+  padding: 0;
+}
+
+.settings-disclosure summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: start;
+  padding: 0.72rem 1rem;
+  border-radius: var(--control-pill-radius);
+  border: 1px solid rgba(24, 32, 33, 0.1);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.settings-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-disclosure summary::before {
+  content: "+";
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.settings-disclosure[open] summary::before {
+  content: "-";
+}
+
+.settings-disclosure-body {
+  display: grid;
+  gap: var(--space-4);
 }
 
 .config-switch-list {
