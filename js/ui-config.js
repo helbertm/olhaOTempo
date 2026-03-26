@@ -15,6 +15,8 @@ import {
   splitMinutesSeconds,
 } from "./time.js";
 
+const APP_TITLE = "De olho no tempo";
+
 export function populateStaticOptions(elements) {
   elements.themeSwitchGroup.innerHTML = THEME_OPTIONS.map(
     (theme) => `
@@ -183,8 +185,17 @@ export function refreshConfigSummary({ app, elements }) {
 }
 
 export function updateDocumentTitle({ app, elements }) {
-  const title = app.state.settings.presentationTitle || "De olho no tempo";
-  document.title = `${title} · De olho no tempo`;
+  const configuredTitle = app.state.settings.presentationTitle.trim();
+
+  if (
+    configuredTitle.length === 0 ||
+    configuredTitle.toLocaleLowerCase("pt-BR") === APP_TITLE.toLocaleLowerCase("pt-BR")
+  ) {
+    document.title = APP_TITLE;
+  } else {
+    document.title = `${configuredTitle} · ${APP_TITLE}`;
+  }
+
   elements.sectionsPanelTitle.textContent = getSectionsPanelTitle(app.state.settings);
 }
 

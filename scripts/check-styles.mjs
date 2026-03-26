@@ -9,6 +9,9 @@ const REQUIRED_TOKENS = [
   "--control-pill-radius",
   "--panel-padding-md",
   "@media (prefers-reduced-motion: reduce)",
+  '[data-content-layout="split"]',
+  '[data-controls-layout="compact-grid"]',
+  '[data-title-density="tight"]',
 ];
 
 for (const token of REQUIRED_TOKENS) {

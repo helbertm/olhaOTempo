@@ -87,45 +87,65 @@
                   </div>
 
                   <div class="config-switch-list">
-                    <section class="config-switch-item">
-                      <div class="config-switch-copy">
-                        <strong>Tela cheia</strong>
-                      </div>
-                      <label class="switch-control">
-                        <input id="auto-fullscreen-enabled" type="checkbox" checked />
+                    <label class="config-switch-item" for="auto-fullscreen-enabled">
+                      <span class="config-switch-copy">
+                        <strong id="auto-fullscreen-label">Tela cheia</strong>
+                      </span>
+                      <span class="switch-control">
+                        <input
+                          id="auto-fullscreen-enabled"
+                          type="checkbox"
+                          checked
+                          aria-labelledby="auto-fullscreen-label"
+                        />
                         <span class="switch-slider" aria-hidden="true"></span>
-                      </label>
-                    </section>
+                      </span>
+                    </label>
 
-                    <section class="config-switch-item">
-                      <div class="config-switch-copy">
-                        <strong>Timer global</strong>
-                      </div>
-                      <label class="switch-control">
-                        <input id="show-presentation-timer" type="checkbox" checked />
+                    <label class="config-switch-item" for="show-presentation-timer">
+                      <span class="config-switch-copy">
+                        <strong id="show-presentation-timer-label">Timer global</strong>
+                      </span>
+                      <span class="switch-control">
+                        <input
+                          id="show-presentation-timer"
+                          type="checkbox"
+                          checked
+                          aria-labelledby="show-presentation-timer-label"
+                        />
                         <span class="switch-slider" aria-hidden="true"></span>
-                      </label>
-                    </section>
+                      </span>
+                    </label>
 
-                    <section class="config-switch-item">
-                      <div class="config-switch-copy">
-                        <strong>Exibir etapa</strong>
-                      </div>
-                      <label class="switch-control">
-                        <input id="show-current-section" type="checkbox" checked />
+                    <label class="config-switch-item" for="show-current-section">
+                      <span class="config-switch-copy">
+                        <strong id="show-current-section-label">Exibir etapa</strong>
+                      </span>
+                      <span class="switch-control">
+                        <input
+                          id="show-current-section"
+                          type="checkbox"
+                          checked
+                          aria-labelledby="show-current-section-label"
+                        />
                         <span class="switch-slider" aria-hidden="true"></span>
-                      </label>
-                    </section>
+                      </span>
+                    </label>
 
-                    <section class="config-switch-item">
-                      <div class="config-switch-copy">
-                        <strong>Exibir próxima etapa</strong>
-                      </div>
-                      <label class="switch-control">
-                        <input id="show-next-section" type="checkbox" checked />
+                    <label class="config-switch-item" for="show-next-section">
+                      <span class="config-switch-copy">
+                        <strong id="show-next-section-label">Exibir próxima etapa</strong>
+                      </span>
+                      <span class="switch-control">
+                        <input
+                          id="show-next-section"
+                          type="checkbox"
+                          checked
+                          aria-labelledby="show-next-section-label"
+                        />
                         <span class="switch-slider" aria-hidden="true"></span>
-                      </label>
-                    </section>
+                      </span>
+                    </label>
                   </div>
                 </section>
 
@@ -135,15 +155,19 @@
                     <p class="settings-group-title">Referência de duração da apresentação</p>
                   </div>
 
-                  <section class="config-switch-item">
-                    <div class="config-switch-copy">
-                      <strong>Duração automática</strong>
-                    </div>
-                    <label class="switch-control">
-                      <input id="manual-total-enabled" type="checkbox" />
+                  <label class="config-switch-item" for="manual-total-enabled">
+                    <span class="config-switch-copy">
+                      <strong id="manual-total-enabled-label">Duração automática</strong>
+                    </span>
+                    <span class="switch-control">
+                      <input
+                        id="manual-total-enabled"
+                        type="checkbox"
+                        aria-labelledby="manual-total-enabled-label"
+                      />
                       <span class="switch-slider" aria-hidden="true"></span>
-                    </label>
-                  </section>
+                    </span>
+                  </label>
 
                   <div id="manual-total-fields" class="duration-card">
                     <p class="duration-card-title">Duração total planejada</p>
@@ -197,25 +221,33 @@
                       </div>
 
                       <div class="config-switch-list">
-                        <section class="config-switch-item">
-                          <div class="config-switch-copy">
-                            <strong>Tela ligada</strong>
-                          </div>
-                          <label class="switch-control">
-                            <input id="keep-screen-awake-enabled" type="checkbox" />
+                        <label class="config-switch-item" for="keep-screen-awake-enabled">
+                          <span class="config-switch-copy">
+                            <strong id="keep-screen-awake-enabled-label">Tela ligada</strong>
+                          </span>
+                          <span class="switch-control">
+                            <input
+                              id="keep-screen-awake-enabled"
+                              type="checkbox"
+                              aria-labelledby="keep-screen-awake-enabled-label"
+                            />
                             <span class="switch-slider" aria-hidden="true"></span>
-                          </label>
-                        </section>
+                          </span>
+                        </label>
 
-                        <section class="config-switch-item">
-                          <div class="config-switch-copy">
-                            <strong>Iniciar automaticamente</strong>
-                          </div>
-                          <label class="switch-control">
-                            <input id="auto-start-enabled" type="checkbox" />
+                        <label class="config-switch-item" for="auto-start-enabled">
+                          <span class="config-switch-copy">
+                            <strong id="auto-start-enabled-label">Iniciar automaticamente</strong>
+                          </span>
+                          <span class="switch-control">
+                            <input
+                              id="auto-start-enabled"
+                              type="checkbox"
+                              aria-labelledby="auto-start-enabled-label"
+                            />
                             <span class="switch-slider" aria-hidden="true"></span>
-                          </label>
-                        </section>
+                          </span>
+                        </label>
                       </div>
 
                       <p id="ios-fullscreen-note" class="helper-text platform-note hidden">

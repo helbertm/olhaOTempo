@@ -452,6 +452,17 @@ main {
   border-radius: var(--radius-lg);
   border: 1px solid rgba(24, 32, 33, 0.08);
   background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background 140ms ease;
+}
+
+.config-switch-item:has(input:focus-visible) {
+  border-color: rgba(15, 118, 110, 0.28);
+  box-shadow: var(--state-focus-ring);
+  background: rgba(255, 255, 255, 0.74);
 }
 
 .config-switch-copy {
@@ -467,6 +478,7 @@ main {
   grid-template-columns: 1fr;
   align-items: stretch;
   gap: var(--space-4);
+  cursor: default;
 }
 
 .theme-switch-group {
@@ -598,7 +610,7 @@ main {
   display: inline-flex;
   align-items: center;
   justify-self: end;
-  cursor: pointer;
+  pointer-events: none;
 }
 
 .switch-control input {
@@ -789,7 +801,9 @@ main {
   min-height: calc(100vh - 36px);
   padding: 18px clamp(18px, 3vw, 42px) 24px;
   border-radius: 32px;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--presentation-bg);
   color: var(--presentation-text);
   border: 1px solid var(--presentation-border);
@@ -868,11 +882,13 @@ body[data-view="presentation"] .presentation-frame {
 #presentation-view {
   --presentation-shell-gap: 20px;
   --presentation-track-width: min(94vw, 1540px);
-  --presentation-main-align: center;
   --presentation-main-gap: 24px;
+  --presentation-topbar-budget: 72px;
+  --presentation-copy-budget: 176px;
   --presentation-title-width: var(--presentation-track-width);
   --presentation-title-padding: 18px 28px;
   --presentation-title-size: clamp(3rem, 7.4vw, 6.8rem);
+  --presentation-title-scale: 1;
   --presentation-title-line-height: 0.94;
   --presentation-title-tracking: 0.045em;
   --presentation-title-radius: 24px;
@@ -882,6 +898,8 @@ body[data-view="presentation"] .presentation-frame {
   --presentation-panel-radius: 26px;
   --presentation-panel-primary-padding: 28px 18px 24px;
   --presentation-panel-secondary-padding: 22px 22px;
+  --presentation-primary-budget: 280px;
+  --presentation-secondary-budget: 180px;
   --presentation-primary-size: min(27vw, 28vh, 18rem);
   --presentation-primary-single-size: min(32vw, 34vh, 21rem);
   --presentation-secondary-size: min(14vw, 14vh, 9.5rem);
@@ -889,16 +907,25 @@ body[data-view="presentation"] .presentation-frame {
   --presentation-controls-max-width: min(100%, 760px);
   --presentation-controls-justify: flex-end;
   --presentation-control-gap: 10px;
+  --presentation-control-shell-padding: 8px;
+  --presentation-control-shell-radius: 999px;
   --presentation-control-padding: 0.7rem 1rem;
   --presentation-control-min-height: 42px;
   --presentation-control-font-size: 0.88rem;
+  --presentation-control-quiet-opacity: var(--state-quiet-opacity);
+  --presentation-control-edit-opacity: 0.94;
+  --presentation-control-touch-opacity: 0.9;
 }
 
 #presentation-view[data-viewport-mode="tablet"] {
   --presentation-shell-gap: 18px;
   --presentation-track-width: min(94vw, 1240px);
   --presentation-main-gap: 20px;
+  --presentation-topbar-budget: 64px;
+  --presentation-copy-budget: 152px;
   --presentation-title-size: min(7vw, 8vh, 5.1rem);
+  --presentation-primary-budget: 230px;
+  --presentation-secondary-budget: 156px;
   --presentation-primary-size: min(22vw, 20vh, 13rem);
   --presentation-primary-single-size: min(26vw, 24vh, 15rem);
   --presentation-secondary-size: min(11vw, 10vh, 6rem);
@@ -907,65 +934,104 @@ body[data-view="presentation"] .presentation-frame {
 
 #presentation-view[data-viewport-mode="compact-portrait"] {
   --presentation-shell-gap: 12px;
-  --presentation-track-width: min(100%, 32rem);
-  --presentation-main-align: space-evenly;
-  --presentation-main-gap: 12px;
-  --presentation-title-width: min(100%, 32rem);
+  --presentation-track-width: min(100%, 34rem);
+  --presentation-main-gap: 16px;
+  --presentation-topbar-budget: clamp(92px, 18vh, 136px);
+  --presentation-copy-budget: clamp(108px, 20vh, 184px);
+  --presentation-title-width: min(100%, 34rem);
   --presentation-title-padding: 12px 14px;
-  --presentation-title-size: min(12.6vw, 5.9vh, 3.1rem);
-  --presentation-title-line-height: 0.94;
+  --presentation-title-size: clamp(2.15rem, 9.4vw, 3.6rem);
+  --presentation-title-line-height: 0.92;
   --presentation-title-radius: 18px;
-  --presentation-timer-gap: 14px;
+  --presentation-timer-gap: 16px;
   --presentation-panel-padding: 14px;
   --presentation-panel-radius: 20px;
   --presentation-panel-primary-padding: 16px 10px 14px;
   --presentation-panel-secondary-padding: 14px 12px;
-  --presentation-primary-size: min(25vw, 14.5vh, 7rem);
-  --presentation-primary-single-size: min(29vw, 16.5vh, 8rem);
-  --presentation-secondary-size: min(15vw, 8.2vh, 3.8rem);
-  --presentation-overtime-size: min(30vw, 18vh, 8.5rem);
-  --presentation-controls-max-width: min(100%, 360px);
+  --presentation-primary-budget: clamp(180px, 30vh, 320px);
+  --presentation-secondary-budget: clamp(112px, 18vh, 170px);
+  --presentation-primary-size: clamp(5.2rem, 22vw, 8rem);
+  --presentation-primary-single-size: clamp(6rem, 25vw, 9rem);
+  --presentation-secondary-size: clamp(3.1rem, 12vw, 4.9rem);
+  --presentation-overtime-size: clamp(7rem, 29vw, 10rem);
+  --presentation-controls-max-width: min(100%, 420px);
   --presentation-controls-justify: center;
   --presentation-control-gap: 8px;
-  --presentation-control-padding: 0.52rem 0.42rem;
-  --presentation-control-min-height: 38px;
-  --presentation-control-font-size: 0.74rem;
+  --presentation-control-shell-padding: 6px;
+  --presentation-control-shell-radius: 24px;
+  --presentation-control-padding: 0.55rem 0.6rem;
+  --presentation-control-min-height: 36px;
+  --presentation-control-font-size: 0.75rem;
 }
 
 #presentation-view[data-viewport-mode="compact-landscape"] {
   --presentation-shell-gap: 10px;
-  --presentation-track-width: min(96vw, 1280px);
-  --presentation-main-gap: 10px;
-  --presentation-title-width: min(100%, 96vw);
-  --presentation-title-padding: 10px 16px;
-  --presentation-title-size: min(7vw, 8.5vh, 3rem);
-  --presentation-title-line-height: 0.92;
+  --presentation-track-width: min(100%, 1280px);
+  --presentation-main-gap: 12px;
+  --presentation-topbar-budget: clamp(48px, 15vh, 74px);
+  --presentation-copy-budget: clamp(132px, 42vh, 240px);
+  --presentation-title-width: min(100%, 34rem);
+  --presentation-title-padding: 12px 14px;
+  --presentation-title-size: clamp(2.1rem, 5.2vw, 3.8rem);
+  --presentation-title-line-height: 0.9;
   --presentation-title-radius: 18px;
   --presentation-timer-gap: 12px;
   --presentation-panel-padding: 10px;
   --presentation-panel-radius: 18px;
   --presentation-panel-primary-padding: 14px 10px 12px;
   --presentation-panel-secondary-padding: 10px 12px;
-  --presentation-primary-size: min(18vw, 23vh, 6.5rem);
-  --presentation-primary-single-size: min(22vw, 27vh, 7.4rem);
-  --presentation-secondary-size: min(9vw, 12vh, 3.5rem);
-  --presentation-overtime-size: min(22vw, 28vh, 7.5rem);
-  --presentation-controls-max-width: min(72vw, 620px);
+  --presentation-primary-budget: clamp(164px, 52vh, 300px);
+  --presentation-secondary-budget: clamp(96px, 24vh, 170px);
+  --presentation-primary-size: clamp(6rem, 16vw, 11rem);
+  --presentation-primary-single-size: clamp(7rem, 18vw, 12rem);
+  --presentation-secondary-size: clamp(3rem, 7.6vw, 5.4rem);
+  --presentation-overtime-size: clamp(8rem, 20vw, 14rem);
+  --presentation-controls-max-width: min(100%, 560px);
   --presentation-controls-justify: flex-start;
   --presentation-control-gap: 8px;
-  --presentation-control-padding: 0.42rem 0.7rem;
+  --presentation-control-shell-padding: 6px;
+  --presentation-control-shell-radius: 20px;
+  --presentation-control-padding: 0.46rem 0.72rem;
   --presentation-control-min-height: 34px;
   --presentation-control-font-size: 0.74rem;
+}
+
+#presentation-view[data-title-density="compact"] {
+  --presentation-title-scale: 0.9;
+  --presentation-title-tracking: 0.03em;
+}
+
+#presentation-view[data-title-density="tight"] {
+  --presentation-title-scale: 0.8;
+  --presentation-title-tracking: 0.018em;
+}
+
+#presentation-view[data-viewport-mode="compact-portrait"] .presentation-frame {
+  padding:
+    calc(12px + env(safe-area-inset-top))
+    calc(12px + env(safe-area-inset-right))
+    calc(16px + env(safe-area-inset-bottom))
+    calc(12px + env(safe-area-inset-left));
+}
+
+#presentation-view[data-viewport-mode="compact-landscape"] .presentation-frame {
+  padding:
+    calc(8px + env(safe-area-inset-top))
+    calc(10px + env(safe-area-inset-right))
+    calc(10px + env(safe-area-inset-bottom))
+    calc(10px + env(safe-area-inset-left));
 }
 
 .presentation-frame {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: var(--presentation-shell-gap);
+  align-items: start;
 }
 
 .presentation-topbar {
   width: 100%;
+  min-block-size: var(--presentation-topbar-budget);
   display: flex;
   justify-content: var(--presentation-controls-justify);
   align-items: start;
@@ -1010,17 +1076,35 @@ body[data-view="presentation"] .presentation-frame {
 
 .presentation-main {
   display: grid;
-  align-content: var(--presentation-main-align);
+  grid-template-areas:
+    "copy"
+    "timers";
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   justify-items: center;
   gap: var(--presentation-main-gap);
   width: 100%;
 }
 
+#presentation-view[data-content-layout="split"] .presentation-main {
+  grid-template-areas: "copy timers";
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  align-items: stretch;
+  justify-items: stretch;
+}
+
 .presentation-copy {
+  grid-area: copy;
   display: grid;
+  align-content: center;
   justify-items: center;
   gap: 0;
   width: 100%;
+  min-block-size: var(--presentation-copy-budget);
+}
+
+#presentation-view[data-content-layout="split"] .presentation-copy {
+  justify-items: stretch;
 }
 
 #current-section-title {
@@ -1029,25 +1113,44 @@ body[data-view="presentation"] .presentation-frame {
   padding: var(--presentation-title-padding);
   text-align: center;
   text-transform: uppercase;
-  font-size: var(--presentation-title-size);
+  font-size: calc(var(--presentation-title-size) * var(--presentation-title-scale));
   line-height: var(--presentation-title-line-height);
   letter-spacing: var(--presentation-title-tracking);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  hyphens: auto;
   border-radius: var(--presentation-title-radius);
   background: var(--presentation-surface);
   border: 1px solid var(--presentation-border);
 }
 
+#presentation-view[data-content-layout="split"] #current-section-title {
+  width: 100%;
+}
+
 .timer-stack {
+  grid-area: timers;
   display: grid;
   width: var(--presentation-track-width);
   max-width: 100%;
   grid-template-columns: var(--presentation-timer-columns);
+  align-content: stretch;
   gap: var(--presentation-timer-gap);
+}
+
+#presentation-view[data-content-layout="split"] .timer-stack {
+  width: 100%;
+  align-self: stretch;
 }
 
 #presentation-view[data-viewport-mode="compact-landscape"][data-timer-layout="dual"] .timer-stack {
   grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
   align-items: stretch;
+}
+
+#presentation-view[data-content-layout="split"][data-timer-layout="dual"] .timer-stack {
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(0, 1fr);
 }
 
 .timer-panel,
@@ -1065,6 +1168,7 @@ body[data-view="presentation"] .presentation-frame {
   justify-items: center;
   text-align: center;
   padding: var(--presentation-panel-primary-padding);
+  min-block-size: var(--presentation-primary-budget);
 }
 
 .timer-panel-secondary {
@@ -1074,6 +1178,7 @@ body[data-view="presentation"] .presentation-frame {
   justify-items: center;
   text-align: center;
   padding: var(--presentation-panel-secondary-padding);
+  min-block-size: var(--presentation-secondary-budget);
 }
 
 .timer-value {
@@ -1126,24 +1231,40 @@ body[data-view="presentation"] .presentation-frame {
 }
 
 .presentation-controls {
-  width: auto;
-  max-width: var(--presentation-controls-max-width);
+  width: min(100%, var(--presentation-controls-max-width));
+  max-width: 100%;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: var(--presentation-controls-justify);
+  align-items: stretch;
   gap: var(--presentation-control-gap);
-  padding: 8px;
-  border-radius: 999px;
+  padding: var(--presentation-control-shell-padding);
+  border-radius: var(--presentation-control-shell-radius);
   background: var(--presentation-controls-shell);
   border: 1px solid color-mix(in srgb, var(--presentation-border) 94%, transparent);
   box-shadow: 0 16px 30px rgba(0, 0, 0, 0.14);
   backdrop-filter: blur(14px);
 }
 
-#presentation-view[data-viewport-mode="compact-portrait"] .presentation-controls {
+#presentation-view[data-controls-layout="compact-grid"] .presentation-controls {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  width: min(100%, var(--presentation-controls-max-width));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-content: stretch;
+}
+
+#presentation-view[data-controls-layout="compact-grid"] .presentation-controls #edit-mode-button {
+  grid-column: 1 / -1;
+}
+
+#presentation-view[data-controls-layout="compact-grid"] .presentation-controls .primary-button,
+#presentation-view[data-controls-layout="compact-grid"] .presentation-controls .secondary-button,
+#presentation-view[data-controls-layout="compact-grid"] .presentation-controls .ghost-button {
+  width: 100%;
+  justify-content: center;
+}
+
+#presentation-view[data-controls-layout="compact-inline"] .presentation-controls {
+  justify-content: flex-start;
 }
 
 .presentation-controls .primary-button,
@@ -1181,14 +1302,14 @@ body[data-view="presentation"] .presentation-frame {
 #presentation-view[data-session="running"] .presentation-controls .primary-button,
 #presentation-view[data-session="running"] .presentation-controls .secondary-button,
 #presentation-view[data-session="running"] .presentation-controls .ghost-button {
-  opacity: 0.72;
+  opacity: var(--presentation-control-quiet-opacity);
   background: var(--presentation-control-quiet-bg);
   color: var(--presentation-control-quiet-text);
   border-color: var(--presentation-control-quiet-border);
 }
 
 #presentation-view[data-session="running"] .presentation-controls #edit-mode-button {
-  opacity: 0.92;
+  opacity: var(--presentation-control-edit-opacity);
   background: color-mix(in srgb, var(--presentation-control-quiet-bg) 90%, var(--presentation-control-bg));
   color: var(--presentation-control-text);
   border-color: color-mix(in srgb, var(--presentation-control-border) 88%, transparent);
@@ -1207,14 +1328,9 @@ body[data-view="presentation"] .presentation-frame {
 }
 
 @media (hover: none) and (pointer: coarse) {
-  #presentation-view[data-session="running"] .presentation-controls .primary-button,
-  #presentation-view[data-session="running"] .presentation-controls .secondary-button,
-  #presentation-view[data-session="running"] .presentation-controls .ghost-button {
-    opacity: 0.82;
-  }
-
-  #presentation-view[data-session="running"] .presentation-controls #edit-mode-button {
-    opacity: 1;
+  #presentation-view[data-session="running"] {
+    --presentation-control-quiet-opacity: var(--presentation-control-touch-opacity);
+    --presentation-control-edit-opacity: 1;
   }
 }
 
@@ -1347,8 +1463,7 @@ body[data-view="presentation"] .presentation-frame {
   }
 
   .app-header,
-  .panel,
-  .presentation-frame {
+  .panel {
     padding: 20px;
     border-radius: 24px;
   }
@@ -1361,11 +1476,6 @@ body[data-view="presentation"] .presentation-frame {
   .field-grid-two,
   .summary-grid,
   .alert-row {
-    grid-template-columns: 1fr;
-  }
-
-  .config-switch-item,
-  .config-switch-item-theme {
     grid-template-columns: 1fr;
   }
 
@@ -1391,23 +1501,13 @@ body[data-view="presentation"] .presentation-frame {
     width: 100%;
   }
 
-  .primary-button,
-  .secondary-button,
-  .ghost-button,
-  .icon-button,
-  .danger-button {
+  #config-view .primary-button,
+  #config-view .secondary-button,
+  #config-view .ghost-button,
+  #config-view .icon-button,
+  #config-view .danger-button {
     width: 100%;
     justify-content: center;
-  }
-
-  #presentation-view[data-session="running"] .presentation-controls .primary-button,
-  #presentation-view[data-session="running"] .presentation-controls .secondary-button,
-  #presentation-view[data-session="running"] .presentation-controls .ghost-button {
-    opacity: 0.82;
-  }
-
-  #presentation-view[data-session="running"] .presentation-controls #edit-mode-button {
-    opacity: 1;
   }
 
   .overtime-screen strong {

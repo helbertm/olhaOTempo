@@ -6,7 +6,16 @@ import { normalizeSettings } from "../js/model.js";
 import { derivePresentationViewModel } from "../js/presentation-ui.js";
 import { derivePresentationSnapshot, startSession } from "../js/timer-engine.js";
 
-function createPresentationApp(settingsOverrides = {}, nowMs = 0) {
+function createSection(id, title, durationSeconds) {
+  return {
+    id,
+    title,
+    durationSeconds,
+    alerts: [],
+  };
+}
+
+function createPresentationApp(settingsOverrides = {}, nowMs = 0, viewportMode = "compact-portrait") {
   const state = createDefaultAppState();
 
   state.settings = normalizeSettings({
@@ -28,7 +37,7 @@ function createPresentationApp(settingsOverrides = {}, nowMs = 0) {
       supported: true,
       shouldPersist: false,
     },
-    presentationViewportMode: "compact-portrait",
+    presentationViewportMode: viewportMode,
     presentationRenderCache: {
       structureKey: "",
       sectionTimerText: "",
@@ -50,6 +59,7 @@ test("view model usa layout dual durante etapas intermediarias", () => {
   assert.equal(viewModel.layoutMode, "dual");
   assert.equal(viewModel.showGlobalTimer, true);
   assert.equal(viewModel.controls.showPause, true);
+  assert.equal(viewModel.controls.layout, "compact-grid");
 });
 
 test("view model oculta timer global na ultima etapa", () => {
@@ -66,6 +76,29 @@ test("view model oculta timer global na ultima etapa", () => {
   assert.equal(viewModel.showGlobalTimer, false);
 });
 
+test("view model usa layout dividido em paisagem compacta", () => {
+  const app = createPresentationApp({}, 0, "compact-landscape");
+  const snapshot = derivePresentationSnapshot(app.state.settings, app.state.runtime.session, 0);
+  const viewModel = derivePresentationViewModel({ app, snapshot });
+
+  assert.equal(viewModel.contentLayout, "split");
+  assert.equal(viewModel.controls.layout, "compact-inline");
+});
+
+test("view model reduz densidade para titulo longo em retrato compacto", () => {
+  const app = createPresentationApp({
+    sections: [
+      createSection("section-1", "Abertura da demonstração principal", 300),
+      createSection("section-2", "Perguntas finais e encaminhamentos", 240),
+    ],
+  });
+  const snapshot = derivePresentationSnapshot(app.state.settings, app.state.runtime.session, 0);
+  const viewModel = derivePresentationViewModel({ app, snapshot });
+
+  assert.equal(viewModel.titleDensity, "tight");
+  assert.match(viewModel.headerText, /Abertura/);
+});
+
 test("view model respeita combinacao de etapa atual e proxima", () => {
   const app = createPresentationApp({
     showCurrentSection: false,
@@ -76,4 +109,14 @@ test("view model respeita combinacao de etapa atual e proxima", () => {
 
   assert.equal(viewModel.headerText, "Demonstração principal");
   assert.equal(viewModel.showHeader, true);
+});
+
+test("view model remove layout dividido quando entra em overtime", () => {
+  const app = createPresentationApp({}, 0, "compact-landscape");
+  const totalMs = (300 + 540 + 180) * 1000 + 1_000;
+  const snapshot = derivePresentationSnapshot(app.state.settings, app.state.runtime.session, totalMs);
+  const viewModel = derivePresentationViewModel({ app, snapshot });
+
+  assert.equal(viewModel.showOvertime, true);
+  assert.equal(viewModel.contentLayout, "stacked");
 });

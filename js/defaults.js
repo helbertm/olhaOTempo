@@ -61,12 +61,11 @@ export function createDefaultSection(index = 0) {
     id: createId("section"),
     title: preset.title,
     durationSeconds: preset.durationSeconds,
-    alerts: preset.alerts.map((alert, alertIndex) => ({
+    alerts: preset.alerts.map((alert) => ({
       id: createId("alert"),
       elapsedSeconds: alert.elapsedSeconds,
       highlightSeconds: alert.highlightSeconds ?? DEFAULT_ALERT_HIGHLIGHT_SECONDS,
       color: alert.color,
-      order: alertIndex,
     })),
   };
 }

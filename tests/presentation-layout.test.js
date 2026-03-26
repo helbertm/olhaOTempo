@@ -38,3 +38,16 @@ test("prefere visualViewport quando disponivel", () => {
 
   assert.equal(getPresentationViewportMode(windowRef), "compact-portrait");
 });
+
+test("classifica paisagem compacta usando visualViewport reduzida", () => {
+  const windowRef = {
+    innerWidth: 932,
+    innerHeight: 430,
+    visualViewport: {
+      width: 812,
+      height: 343,
+    },
+  };
+
+  assert.equal(getPresentationViewportMode(windowRef), "compact-landscape");
+});

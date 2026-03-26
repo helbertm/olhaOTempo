@@ -70,8 +70,21 @@ export function derivePresentationViewModel({
   const isLastSection = Boolean(snapshot.currentSection) && !snapshot.nextSection;
   const showGlobalTimer = settings.showPresentationTimer && !isLastSection;
   const layoutMode = showGlobalTimer ? "dual" : "single";
+  const contentLayout = getContentLayout({
+    viewportMode: app.presentationViewportMode,
+    isFinalOvertime: snapshot.isFinalOvertime,
+  });
+  const titleDensity = getTitleDensity({
+    headerText,
+    viewportMode: app.presentationViewportMode,
+  });
   const activeAlert = snapshot.activeAlerts.at(-1) ?? null;
-  const controls = buildControlState({ app, snapshot, canStart });
+  const controls = buildControlState({
+    app,
+    snapshot,
+    canStart,
+    viewportMode: app.presentationViewportMode,
+  });
   const fullscreenText = getFullscreenChipText(app);
   const wakeLockText = getWakeLockChipText(app);
   const visibilityText = visibilityState === "visible"
@@ -86,6 +99,11 @@ export function derivePresentationViewModel({
   const overtimeText = snapshot.isFinalOvertime
     ? formatClockMilliseconds(-snapshot.finalOvertimeMs, "countdown")
     : "";
+  const modeSummaryText = snapshot.isFinalOvertime
+    ? "Contagem do overtime final."
+    : showGlobalTimer
+      ? "Contagem regressiva da etapa e do total."
+      : "Contagem regressiva da etapa atual.";
 
   return {
     canStart,
@@ -97,10 +115,12 @@ export function derivePresentationViewModel({
     visibilityText,
     fullscreenText,
     wakeLockText,
-    modeSummaryText: "Contagem regressiva da etapa e do total.",
+    modeSummaryText,
     headerText: canStart ? headerText : headerText || "Revise o roteiro",
     showHeader: Boolean(headerText),
     presentationState: snapshot.isFinalOvertime ? "overtime" : layoutMode,
+    contentLayout,
+    titleDensity,
     layoutMode,
     showMain: !snapshot.isFinalOvertime,
     showOvertime: snapshot.isFinalOvertime,
@@ -114,7 +134,12 @@ export function derivePresentationViewModel({
   };
 }
 
-function buildControlState({ app, snapshot, canStart }) {
+function buildControlState({
+  app,
+  snapshot,
+  canStart,
+  viewportMode,
+}) {
   const sessionStatus = app.state.runtime.session.status;
 
   return {
@@ -124,6 +149,7 @@ function buildControlState({ app, snapshot, canStart }) {
     showReset: !(sessionStatus === "idle" && snapshot.totalElapsedMs === 0),
     showFullscreen: app.fullscreenState.requestSupported && !app.fullscreenState.standalone,
     fullscreenLabel: app.fullscreenState.active ? "Sair da tela cheia" : "Tela cheia",
+    layout: getControlsLayout(viewportMode),
   };
 }
 
@@ -140,6 +166,8 @@ function renderPresentationStructure({ app, elements }, viewModel) {
     viewModel.headerText,
     viewModel.showHeader,
     viewModel.presentationState,
+    viewModel.contentLayout,
+    viewModel.titleDensity,
     viewModel.layoutMode,
     viewModel.showMain,
     viewModel.showOvertime,
@@ -150,6 +178,7 @@ function renderPresentationStructure({ app, elements }, viewModel) {
     viewModel.controls.showReset,
     viewModel.controls.showFullscreen,
     viewModel.controls.fullscreenLabel,
+    viewModel.controls.layout,
   ].join("|");
 
   if (app.presentationRenderCache.structureKey === structureKey) {
@@ -163,6 +192,9 @@ function renderPresentationStructure({ app, elements }, viewModel) {
   elements.presentationView.dataset.viewportMode = viewModel.viewportMode;
   elements.presentationView.dataset.presentationState = viewModel.presentationState;
   elements.presentationView.dataset.timerLayout = viewModel.layoutMode;
+  elements.presentationView.dataset.contentLayout = viewModel.contentLayout;
+  elements.presentationView.dataset.titleDensity = viewModel.titleDensity;
+  elements.presentationView.dataset.controlsLayout = viewModel.controls.layout;
   elements.presentationMain.dataset.layout = viewModel.layoutMode;
   elements.timerStack.dataset.layout = viewModel.layoutMode;
 
@@ -290,6 +322,67 @@ function getWakeLockChipText(app) {
   return app.wakeLockState.shouldPersist
     ? "Wake lock aguardando foco"
     : "Wake lock pronto";
+}
+
+function getControlsLayout(viewportMode) {
+  if (viewportMode === "compact-portrait") {
+    return "compact-grid";
+  }
+
+  if (viewportMode === "compact-landscape") {
+    return "compact-inline";
+  }
+
+  return "inline";
+}
+
+function getContentLayout({
+  viewportMode,
+  isFinalOvertime,
+}) {
+  if (isFinalOvertime) {
+    return "stacked";
+  }
+
+  return viewportMode === "compact-landscape" ? "split" : "stacked";
+}
+
+function getTitleDensity({
+  headerText,
+  viewportMode,
+}) {
+  const text = headerText.trim().replace(/\s+/g, " ");
+  const textLength = text.length;
+
+  if (textLength === 0) {
+    return "default";
+  }
+
+  if (viewportMode === "compact-landscape") {
+    if (textLength >= 28) {
+      return "tight";
+    }
+
+    if (textLength >= 16) {
+      return "compact";
+    }
+
+    return "default";
+  }
+
+  if (viewportMode === "compact-portrait") {
+    if (textLength >= 42) {
+      return "tight";
+    }
+
+    if (textLength >= 24) {
+      return "compact";
+    }
+
+    return "default";
+  }
+
+  return textLength >= 52 ? "compact" : "default";
 }
 
 function applyText(node, value) {
