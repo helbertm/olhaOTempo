@@ -15,7 +15,7 @@ export function renderPresentation({
     app.state.runtime.session,
     Date.now(),
   );
-  const viewModel = buildPresentationViewModel({ app, snapshot });
+  const viewModel = derivePresentationViewModel({ app, snapshot });
 
   renderPresentationStructure({ app, elements }, viewModel);
   renderPresentationClocks({ app, elements }, viewModel);
@@ -52,7 +52,11 @@ export function getPresentationHeader(currentSectionLabel, nextSectionLabel, set
   return parts.join(" -> ");
 }
 
-function buildPresentationViewModel({ app, snapshot }) {
+export function derivePresentationViewModel({
+  app,
+  snapshot,
+  visibilityState = typeof document === "undefined" ? "visible" : document.visibilityState,
+}) {
   const { settings, runtime } = app.state;
   const theme = getThemeMeta(settings.themeId);
   const currentSectionLabel = snapshot.currentSection
@@ -70,8 +74,9 @@ function buildPresentationViewModel({ app, snapshot }) {
   const controls = buildControlState({ app, snapshot, canStart });
   const fullscreenText = getFullscreenChipText(app);
   const wakeLockText = getWakeLockChipText(app);
-  const visibilityText =
-    document.visibilityState === "visible" ? "Aba visível" : "Aba em segundo plano";
+  const visibilityText = visibilityState === "visible"
+    ? "Aba visível"
+    : "Aba em segundo plano";
   const sectionTimerText = snapshot.currentSection
     ? formatClockMilliseconds(snapshot.currentSectionRemainingMs, "countdown")
     : "00:00";
