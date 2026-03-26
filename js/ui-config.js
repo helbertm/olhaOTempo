@@ -1,0 +1,220 @@
+import {
+  MAX_ALERTS_PER_SECTION,
+  THEME_OPTIONS,
+} from "./constants.js";
+import {
+  canStartPresentation,
+  getConfiguredTotalSeconds,
+  getSectionIssues,
+  getSectionsTotalSeconds,
+} from "./model.js";
+import {
+  formatClockSeconds,
+  formatHumanDuration,
+  splitHoursMinutesSeconds,
+  splitMinutesSeconds,
+} from "./time.js";
+
+export function populateStaticOptions(elements) {
+  elements.themeSelect.innerHTML = THEME_OPTIONS.map(
+    (theme) => `<option value="${theme.id}">${theme.label}</option>`,
+  ).join("");
+  elements.themeSwitchGroup.innerHTML = THEME_OPTIONS.map(
+    (theme) => `
+      <button
+        type="button"
+        class="theme-switch-option"
+        data-theme-choice="${theme.id}"
+        aria-pressed="false"
+        aria-label="${theme.label}"
+      >
+        <span class="theme-switch-visual" aria-hidden="true">
+          <span class="theme-switch-screen">
+            <span class="theme-switch-screen-title">TITULO</span>
+            <span class="theme-switch-screen-main">15:10</span>
+            <span class="theme-switch-screen-total">32:25</span>
+          </span>
+        </span>
+      </button>
+    `,
+  ).join("");
+}
+
+export function renderConfig({ app, elements }) {
+  const { settings } = app.state;
+  const manualTotalParts = splitHoursMinutesSeconds(settings.totalManualSeconds);
+
+  elements.presentationTitle.value = settings.presentationTitle;
+  elements.themeSelect.value = settings.themeId;
+  elements.autoFullscreenEnabled.checked = settings.autoFullscreen;
+  elements.autoStartEnabled.checked = settings.autoStartOnOpen;
+  updateConfigWakeLockButton({ app, elements });
+  elements.showPresentationTimer.checked = settings.showPresentationTimer;
+  elements.showCurrentSection.checked = settings.showCurrentSection;
+  elements.showNextSection.checked = settings.showNextSection;
+  elements.manualTotalEnabled.checked = settings.totalDurationMode === "manual";
+  elements.totalHours.value = manualTotalParts.hours;
+  elements.totalMinutes.value = manualTotalParts.minutes;
+  elements.totalSeconds.value = manualTotalParts.seconds;
+  elements.totalHours.disabled = settings.totalDurationMode !== "manual";
+  elements.totalMinutes.disabled = settings.totalDurationMode !== "manual";
+  elements.totalSeconds.disabled = settings.totalDurationMode !== "manual";
+
+  const sectionNodes = settings.sections.map((section, index) =>
+    createSectionCard({ app, elements }, section, index),
+  );
+
+  elements.sectionList.replaceChildren(...sectionNodes);
+  refreshConfigSummary({ app, elements });
+  updateDocumentTitle({ app, elements });
+  updateThemeSwitchGroup(elements, settings.themeId);
+}
+
+function createSectionCard({ app, elements }, section, index) {
+  const fragment = elements.sectionTemplate.content.cloneNode(true);
+  const card = fragment.querySelector(".section-card");
+  const titleInput = fragment.querySelector(".section-title-input");
+  const sectionMinutesInput = fragment.querySelector(".section-minutes-input");
+  const sectionSecondsInput = fragment.querySelector(".section-seconds-input");
+  const sectionOrder = fragment.querySelector(".section-order");
+  const sectionDurationPreview = fragment.querySelector(".section-duration-preview");
+  const addAlertButton = fragment.querySelector(".add-alert-button");
+  const moveUpButton = fragment.querySelector(".move-up-button");
+  const moveDownButton = fragment.querySelector(".move-down-button");
+  const alertList = fragment.querySelector(".alert-list");
+  const sectionWarning = fragment.querySelector(".section-warning");
+  const durationParts = splitMinutesSeconds(section.durationSeconds);
+  const issues = getSectionIssues(section);
+
+  card.dataset.sectionId = section.id;
+  sectionOrder.textContent = `Etapa ${index + 1}`;
+  sectionDurationPreview.textContent = `Duração: ${formatHumanDuration(section.durationSeconds)}`;
+  titleInput.value = section.title;
+  sectionMinutesInput.value = durationParts.minutes;
+  sectionSecondsInput.value = durationParts.seconds;
+  moveUpButton.disabled = index === 0;
+  moveDownButton.disabled = index === app.state.settings.sections.length - 1;
+  fragment.querySelector(".remove-section-button").disabled =
+    app.state.settings.sections.length === 1;
+  addAlertButton.disabled = section.alerts.length >= MAX_ALERTS_PER_SECTION;
+
+  if (issues.length > 0) {
+    sectionWarning.textContent = issues[0];
+    sectionWarning.classList.remove("hidden");
+  }
+
+  if (section.alerts.length === 0) {
+    const emptyAlertText = document.createElement("p");
+    emptyAlertText.className = "helper-text";
+    emptyAlertText.textContent = "Sem alertas visuais nesta etapa.";
+    alertList.append(emptyAlertText);
+  } else {
+    const alertNodes = section.alerts.map((alert) => createAlertRow(elements, alert));
+    alertList.replaceChildren(...alertNodes);
+  }
+
+  return fragment;
+}
+
+function createAlertRow(elements, alert) {
+  const fragment = elements.alertTemplate.content.cloneNode(true);
+  const row = fragment.querySelector(".alert-row");
+  const alertMinutesInput = fragment.querySelector(".alert-minutes-input");
+  const alertSecondsInput = fragment.querySelector(".alert-seconds-input");
+  const alertDurationInput = fragment.querySelector(".alert-duration-input");
+  const alertColorInput = fragment.querySelector(".alert-color-input");
+  const alertParts = splitMinutesSeconds(alert.elapsedSeconds);
+
+  row.dataset.alertId = alert.id;
+  alertMinutesInput.value = alertParts.minutes;
+  alertSecondsInput.value = alertParts.seconds;
+  alertDurationInput.value = alert.highlightSeconds;
+  alertColorInput.value = alert.color;
+
+  return fragment;
+}
+
+export function refreshConfigSummary({ app, elements }) {
+  const { settings } = app.state;
+  const sectionsTotalSeconds = getSectionsTotalSeconds(settings);
+  const configuredTotalSeconds = getConfiguredTotalSeconds(settings);
+  const canStart = canStartPresentation(settings);
+  const manualIsEnabled = settings.totalDurationMode === "manual";
+  const storageMeta = getStorageStatusMeta({
+    loadStatus: app.loadStatus,
+    saveStatus: app.saveStatus,
+  });
+
+  elements.manualTotalFields.classList.toggle("is-disabled", !manualIsEnabled);
+  elements.sectionsTotalValue.textContent = formatClockSeconds(sectionsTotalSeconds);
+  elements.configuredTotalValue.textContent = formatClockSeconds(configuredTotalSeconds);
+  elements.openPresentationButton.disabled = !canStart;
+  elements.storageStatus.textContent = storageMeta.label;
+  elements.storageStatus.classList.toggle("inline-status-saved", storageMeta.state === "saved");
+  elements.storageStatus.classList.toggle(
+    "inline-status-unsaved",
+    storageMeta.state === "unsaved",
+  );
+  elements.iosFullscreenNote.classList.toggle(
+    "hidden",
+    app.fullscreenState.installHint !== "ios-home-screen",
+  );
+
+  if (!manualIsEnabled) {
+    elements.manualTotalNote.textContent =
+      "O timer total da apresentação segue a soma automática das etapas.";
+  } else if (settings.totalManualSeconds < sectionsTotalSeconds) {
+    elements.manualTotalNote.textContent =
+      "A meta manual serve como referência, mas o timer total da apresentação segue o roteiro.";
+  } else if (settings.totalManualSeconds > sectionsTotalSeconds) {
+    elements.manualTotalNote.textContent =
+      "A meta manual serve como referência, mas o timer total da apresentação segue o roteiro.";
+  } else {
+    elements.manualTotalNote.textContent =
+      "A meta manual está alinhada com a soma das etapas.";
+  }
+}
+
+export function updateDocumentTitle({ app, elements }) {
+  const title = app.state.settings.presentationTitle || "De olho no tempo";
+  document.title = `${title} · De olho no tempo`;
+  elements.sectionsPanelTitle.textContent = getSectionsPanelTitle(app.state.settings);
+}
+
+export function getSectionsPanelTitle(settings) {
+  const title = settings.presentationTitle.trim();
+  return title ? `${title} - Etapas` : "Etapas";
+}
+
+export function getStorageStatusMeta({ loadStatus, saveStatus }) {
+  const saveFailed = saveStatus === "error" || saveStatus === "unavailable";
+  const hasSavedLocally = saveStatus === "saved" || (loadStatus === "loaded" && !saveFailed);
+
+  if (hasSavedLocally) {
+    return {
+      label: "Configurações salvas",
+      state: "saved",
+    };
+  }
+
+  return {
+    label: "Configurações não salvas",
+    state: "unsaved",
+  };
+}
+
+export function updateConfigWakeLockButton({ app, elements }) {
+  const isEnabled = app.state.settings.keepScreenAwake;
+  elements.configWakeLockButton.setAttribute("aria-pressed", String(isEnabled));
+  elements.configWakeLockButton.classList.toggle("switch-button-active", isEnabled);
+}
+
+export function updateThemeSwitchGroup(elements, activeThemeId) {
+  const themeButtons = elements.themeSwitchGroup.querySelectorAll("[data-theme-choice]");
+
+  for (const themeButton of themeButtons) {
+    const isActive = themeButton.dataset.themeChoice === activeThemeId;
+    themeButton.setAttribute("aria-pressed", String(isActive));
+    themeButton.classList.toggle("theme-switch-option-active", isActive);
+  }
+}
