@@ -78,6 +78,18 @@ export function getSelectedThemeId(elements) {
   return THEME_OPTIONS[0].id;
 }
 
+function getManualTotalNote(settings, sectionsTotalSeconds) {
+  if (settings.totalDurationMode !== "manual") {
+    return "O timer total da apresentação segue a soma automática das etapas.";
+  }
+
+  if (settings.totalManualSeconds === sectionsTotalSeconds) {
+    return "A meta manual está alinhada com a soma das etapas.";
+  }
+
+  return "A meta manual serve como referência, mas o timer total da apresentação segue o roteiro.";
+}
+
 function createSectionCard({ app, elements }, section, index) {
   const fragment = elements.sectionTemplate.content.cloneNode(true);
   const card = fragment.querySelector(".section-card");
@@ -167,20 +179,7 @@ export function refreshConfigSummary({ app, elements }) {
     "hidden",
     app.fullscreenState.installHint !== "ios-home-screen",
   );
-
-  if (!manualIsEnabled) {
-    elements.manualTotalNote.textContent =
-      "O timer total da apresentação segue a soma automática das etapas.";
-  } else if (settings.totalManualSeconds < sectionsTotalSeconds) {
-    elements.manualTotalNote.textContent =
-      "A meta manual serve como referência, mas o timer total da apresentação segue o roteiro.";
-  } else if (settings.totalManualSeconds > sectionsTotalSeconds) {
-    elements.manualTotalNote.textContent =
-      "A meta manual serve como referência, mas o timer total da apresentação segue o roteiro.";
-  } else {
-    elements.manualTotalNote.textContent =
-      "A meta manual está alinhada com a soma das etapas.";
-  }
+  elements.manualTotalNote.textContent = getManualTotalNote(settings, sectionsTotalSeconds);
 }
 
 export function updateDocumentTitle({ app, elements }) {

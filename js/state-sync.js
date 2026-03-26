@@ -3,7 +3,10 @@ import {
   createDefaultAlert,
   createDefaultSection,
 } from "./defaults.js";
-import { normalizeSettings } from "./model.js";
+import {
+  areSettingsEqual,
+  normalizeSettings,
+} from "./model.js";
 import { savePersistedState } from "./storage.js";
 import {
   hasActiveSession,
@@ -26,15 +29,14 @@ export function syncSettingsFromDom({
   renderPresentation,
   showToast,
 }) {
-  const previousSettings = JSON.stringify(app.state.settings);
+  const previousSettings = app.state.settings;
   const nextSettings = normalizeSettings(serializeSettingsFromDom({ app, elements }));
-  const didChange = JSON.stringify(nextSettings) !== previousSettings;
+  const didChange = !areSettingsEqual(previousSettings, nextSettings);
 
   app.state.settings = nextSettings;
 
   if (didChange && hasActiveSession(app.state.runtime.session)) {
-    app.state.runtime.session = resetSession();
-    showToast("O cronômetro foi zerado porque o roteiro foi alterado.");
+    resetActiveSession(app, showToast);
   }
 
   persistState();
@@ -184,8 +186,7 @@ export function mutateSettingsStructure({
   app.state.settings = normalizeSettings(settingsClone);
 
   if (hadActiveSession) {
-    app.state.runtime.session = resetSession();
-    showToast("O cronômetro foi zerado porque o roteiro foi alterado.");
+    resetActiveSession(app, showToast);
   }
 
   persistState();
@@ -203,4 +204,9 @@ export function persistState({ app, refreshConfigSummary }) {
   const result = savePersistedState(app.state);
   app.saveStatus = result.status;
   refreshConfigSummary();
+}
+
+function resetActiveSession(app, showToast) {
+  app.state.runtime.session = resetSession();
+  showToast("O cronômetro foi zerado porque o roteiro foi alterado.");
 }

@@ -217,10 +217,6 @@ export function getSectionIssues(section) {
 export function getSettingsIssues(settings) {
   const issues = [];
 
-  if (settings.sections.length === 0) {
-    issues.push("Adicione pelo menos uma etapa antes de iniciar.");
-  }
-
   for (const section of settings.sections) {
     issues.push(...getSectionIssues(section));
   }
@@ -230,4 +226,46 @@ export function getSettingsIssues(settings) {
 
 export function canStartPresentation(settings) {
   return getSettingsIssues(settings).length === 0;
+}
+
+export function areSettingsEqual(leftSettings, rightSettings) {
+  if (
+    leftSettings.presentationTitle !== rightSettings.presentationTitle ||
+    leftSettings.themeId !== rightSettings.themeId ||
+    leftSettings.autoFullscreen !== rightSettings.autoFullscreen ||
+    leftSettings.keepScreenAwake !== rightSettings.keepScreenAwake ||
+    leftSettings.autoStartOnOpen !== rightSettings.autoStartOnOpen ||
+    leftSettings.showPresentationTimer !== rightSettings.showPresentationTimer ||
+    leftSettings.showCurrentSection !== rightSettings.showCurrentSection ||
+    leftSettings.showNextSection !== rightSettings.showNextSection ||
+    leftSettings.totalDurationMode !== rightSettings.totalDurationMode ||
+    leftSettings.totalManualSeconds !== rightSettings.totalManualSeconds ||
+    leftSettings.sections.length !== rightSettings.sections.length
+  ) {
+    return false;
+  }
+
+  return leftSettings.sections.every((leftSection, sectionIndex) => {
+    const rightSection = rightSettings.sections[sectionIndex];
+
+    if (
+      leftSection.id !== rightSection.id ||
+      leftSection.title !== rightSection.title ||
+      leftSection.durationSeconds !== rightSection.durationSeconds ||
+      leftSection.alerts.length !== rightSection.alerts.length
+    ) {
+      return false;
+    }
+
+    return leftSection.alerts.every((leftAlert, alertIndex) => {
+      const rightAlert = rightSection.alerts[alertIndex];
+
+      return (
+        leftAlert.id === rightAlert.id &&
+        leftAlert.elapsedSeconds === rightAlert.elapsedSeconds &&
+        leftAlert.highlightSeconds === rightAlert.highlightSeconds &&
+        leftAlert.color === rightAlert.color
+      );
+    });
+  });
 }

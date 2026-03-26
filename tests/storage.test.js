@@ -3,7 +3,10 @@ import test from "node:test";
 
 import { STORAGE_KEY } from "../js/constants.js";
 import { createDefaultAppState } from "../js/defaults.js";
-import { normalizeSettings } from "../js/model.js";
+import {
+  areSettingsEqual,
+  normalizeSettings,
+} from "../js/model.js";
 import { loadPersistedState, savePersistedState } from "../js/storage.js";
 
 function createMemoryStorage() {
@@ -170,4 +173,42 @@ test("round-trip preserva todas as configuracoes e a estrutura do roteiro", () =
   assert.equal(saveResult.ok, true);
   assert.equal(loadResult.status, "loaded");
   assert.deepEqual(loadResult.state.settings, expectedSettings);
+});
+
+test("comparacao estrutural de configuracoes identifica igualdade real", () => {
+  const base = normalizeSettings({
+    presentationTitle: "Summit 2026",
+    themeId: "amber-focus",
+    autoFullscreen: false,
+    keepScreenAwake: true,
+    autoStartOnOpen: true,
+    showPresentationTimer: false,
+    showCurrentSection: true,
+    showNextSection: false,
+    totalDurationMode: "manual",
+    totalManualSeconds: 4_800,
+    sections: [
+      {
+        id: "section-1",
+        title: "AB",
+        durationSeconds: 305,
+        alerts: [
+          {
+            id: "alert-1",
+            elapsedSeconds: 120,
+            highlightSeconds: 7,
+            color: "#ef4444",
+          },
+        ],
+      },
+    ],
+  });
+  const same = normalizeSettings(structuredClone(base));
+  const changed = normalizeSettings({
+    ...structuredClone(base),
+    showNextSection: true,
+  });
+
+  assert.equal(areSettingsEqual(base, same), true);
+  assert.equal(areSettingsEqual(base, changed), false);
 });
