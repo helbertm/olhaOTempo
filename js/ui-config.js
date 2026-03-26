@@ -44,6 +44,12 @@ export function populateStaticOptions(elements) {
 export function renderConfig({ app, elements }) {
   const { settings } = app.state;
   const manualTotalParts = splitHoursMinutesSeconds(settings.totalManualSeconds);
+  const openAlertSectionIds = new Set(
+    Array.from(elements.sectionList.querySelectorAll(".section-card"))
+      .filter((card) => card.querySelector(".alerts-disclosure")?.open)
+      .map((card) => card.dataset.sectionId)
+      .filter(Boolean),
+  );
 
   elements.presentationTitle.value = settings.presentationTitle;
   elements.autoFullscreenEnabled.checked = settings.autoFullscreen;
@@ -61,7 +67,7 @@ export function renderConfig({ app, elements }) {
   elements.totalSeconds.disabled = settings.totalDurationMode !== "manual";
 
   const sectionNodes = settings.sections.map((section, index) =>
-    createSectionCard({ app, elements }, section, index),
+    createSectionCard({ app, elements, openAlertSectionIds }, section, index),
   );
 
   elements.sectionList.replaceChildren(...sectionNodes);
@@ -92,7 +98,7 @@ function getManualTotalNote(settings, sectionsTotalSeconds) {
   return "A meta manual serve como referência, mas o timer total da apresentação segue o roteiro.";
 }
 
-function createSectionCard({ app, elements }, section, index) {
+function createSectionCard({ app, elements, openAlertSectionIds }, section, index) {
   const fragment = elements.sectionTemplate.content.cloneNode(true);
   const card = fragment.querySelector(".section-card");
   const titleInput = fragment.querySelector(".section-title-input");
@@ -103,6 +109,8 @@ function createSectionCard({ app, elements }, section, index) {
   const addAlertButton = fragment.querySelector(".add-alert-button");
   const moveUpButton = fragment.querySelector(".move-up-button");
   const moveDownButton = fragment.querySelector(".move-down-button");
+  const alertsDisclosure = fragment.querySelector(".alerts-disclosure");
+  const alertsSummaryMeta = fragment.querySelector(".alerts-summary-meta");
   const alertList = fragment.querySelector(".alert-list");
   const sectionWarning = fragment.querySelector(".section-warning");
   const durationParts = splitMinutesSeconds(section.durationSeconds);
@@ -119,6 +127,8 @@ function createSectionCard({ app, elements }, section, index) {
   fragment.querySelector(".remove-section-button").disabled =
     app.state.settings.sections.length === 1;
   addAlertButton.disabled = section.alerts.length >= MAX_ALERTS_PER_SECTION;
+  alertsDisclosure.open = openAlertSectionIds.has(section.id);
+  alertsSummaryMeta.textContent = getAlertSummaryText(section.alerts.length);
 
   if (issues.length > 0) {
     sectionWarning.textContent = issues[0];
@@ -154,6 +164,18 @@ function createAlertRow(elements, alert) {
   alertColorInput.value = alert.color;
 
   return fragment;
+}
+
+function getAlertSummaryText(alertCount) {
+  if (alertCount === 0) {
+    return "Sem alertas configurados";
+  }
+
+  if (alertCount === 1) {
+    return "1 alerta configurado";
+  }
+
+  return `${alertCount} alertas configurados`;
 }
 
 export function refreshConfigSummary({ app, elements }) {

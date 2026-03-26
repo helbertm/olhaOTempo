@@ -34,3 +34,8 @@ test("switches possuem rotulo visual ligado semanticamente ao checkbox", () => {
     );
   }
 });
+
+test("template de etapa usa disclosure retratil para os alertas", () => {
+  assert.match(html, /<details class="alerts-disclosure alerts-block">/);
+  assert.match(html, /class="alerts-summary-meta">Sem alertas configurados</);
+});

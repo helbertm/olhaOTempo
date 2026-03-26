@@ -404,18 +404,24 @@
 
         <p class="section-warning hidden"></p>
 
-        <section class="alerts-block">
-          <div class="alerts-header">
-            <div>
-              <p class="meta-label">Alertas visuais da etapa</p>
+        <details class="alerts-disclosure alerts-block">
+          <summary>
+            <span class="alerts-summary-copy">
+              <span class="meta-label alerts-summary-title">Alertas visuais da etapa</span>
+              <span class="alerts-summary-meta">Sem alertas configurados</span>
+            </span>
+          </summary>
+
+          <div class="alerts-disclosure-body">
+            <div class="alerts-header">
               <p class="helper-text">Cada alerta muda a cor e pisca pelo tempo configurado.</p>
+              <button class="secondary-button add-alert-button" type="button">
+                Adicionar alerta
+              </button>
             </div>
-            <button class="secondary-button add-alert-button" type="button">
-              Adicionar alerta
-            </button>
+            <div class="alert-list"></div>
           </div>
-          <div class="alert-list"></div>
-        </section>
+        </details>
       </article>
     </template>
 

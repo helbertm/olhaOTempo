@@ -10,6 +10,7 @@ const REQUIRED_PATTERNS = [
   /id="total-timer-value"[\s\S]*role="timer"[\s\S]*aria-live="off"/,
   /id="overtime-value"[\s\S]*role="timer"[\s\S]*aria-live="off"/,
   /id="back-to-top-button"[\s\S]*aria-label="Voltar ao topo"/,
+  /<details class="alerts-disclosure alerts-block">/,
 ];
 const REQUIRED_SWITCHES = [
   ["auto-fullscreen-enabled", "auto-fullscreen-label"],
