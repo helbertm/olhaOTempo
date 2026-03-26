@@ -716,6 +716,13 @@ body[data-view="presentation"] .presentation-frame {
   --presentation-border: rgba(178, 226, 220, 0.18);
   --presentation-accent: #4dd7c7;
   --presentation-accent-soft: rgba(77, 215, 199, 0.12);
+  --presentation-control-bg: rgba(255, 255, 255, 0.92);
+  --presentation-control-text: #091115;
+  --presentation-control-border: rgba(9, 17, 21, 0.16);
+  --presentation-control-quiet-bg: rgba(255, 255, 255, 0.18);
+  --presentation-control-quiet-text: rgba(244, 255, 251, 0.92);
+  --presentation-control-quiet-border: rgba(244, 255, 251, 0.18);
+  --presentation-controls-shell: rgba(255, 255, 255, 0.08);
 }
 
 #presentation-view[data-theme="studio-light"] {
@@ -728,6 +735,13 @@ body[data-view="presentation"] .presentation-frame {
   --presentation-border: rgba(23, 33, 37, 0.1);
   --presentation-accent: #0f766e;
   --presentation-accent-soft: rgba(15, 118, 110, 0.12);
+  --presentation-control-bg: rgba(255, 255, 255, 0.94);
+  --presentation-control-text: #172125;
+  --presentation-control-border: rgba(23, 33, 37, 0.14);
+  --presentation-control-quiet-bg: rgba(255, 255, 255, 0.7);
+  --presentation-control-quiet-text: rgba(23, 33, 37, 0.92);
+  --presentation-control-quiet-border: rgba(23, 33, 37, 0.12);
+  --presentation-controls-shell: rgba(255, 255, 255, 0.52);
 }
 
 #presentation-view[data-theme="amber-focus"] {
@@ -740,6 +754,13 @@ body[data-view="presentation"] .presentation-frame {
   --presentation-border: rgba(255, 201, 123, 0.18);
   --presentation-accent: #f7b955;
   --presentation-accent-soft: rgba(247, 185, 85, 0.13);
+  --presentation-control-bg: rgba(255, 250, 244, 0.94);
+  --presentation-control-text: #1d1306;
+  --presentation-control-border: rgba(29, 19, 6, 0.14);
+  --presentation-control-quiet-bg: rgba(255, 248, 236, 0.2);
+  --presentation-control-quiet-text: rgba(255, 247, 236, 0.94);
+  --presentation-control-quiet-border: rgba(255, 247, 236, 0.18);
+  --presentation-controls-shell: rgba(255, 248, 236, 0.08);
 }
 
 #presentation-view {
@@ -1011,9 +1032,10 @@ body[data-view="presentation"] .presentation-frame {
   gap: var(--presentation-control-gap);
   padding: 8px;
   border-radius: 999px;
-  background: var(--presentation-surface);
-  border: 1px solid var(--presentation-border);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.18);
+  background: var(--presentation-controls-shell);
+  border: 1px solid color-mix(in srgb, var(--presentation-border) 94%, transparent);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(14px);
 }
 
 #presentation-view[data-viewport-mode="compact-portrait"] .presentation-controls {
@@ -1029,9 +1051,9 @@ body[data-view="presentation"] .presentation-frame {
   min-width: 0;
   min-height: var(--presentation-control-min-height);
   padding: var(--presentation-control-padding);
-  background: rgba(255, 255, 255, 0.92);
-  color: #091115;
-  border-color: rgba(9, 17, 21, 0.16);
+  background: var(--presentation-control-bg);
+  color: var(--presentation-control-text);
+  border-color: var(--presentation-control-border);
   font-size: var(--presentation-control-font-size);
   line-height: 1.04;
   transition:
@@ -1043,28 +1065,31 @@ body[data-view="presentation"] .presentation-frame {
 }
 
 .presentation-controls .ghost-button {
-  background: rgba(255, 255, 255, 0.84);
+  background: color-mix(in srgb, var(--presentation-control-bg) 88%, transparent);
 }
 
 #presentation-view[data-session="running"] .presentation-controls {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: none;
+  gap: max(6px, calc(var(--presentation-control-gap) - 2px));
+  padding: 6px;
+  background: color-mix(in srgb, var(--presentation-controls-shell) 84%, transparent);
+  border-color: color-mix(in srgb, var(--presentation-control-quiet-border) 72%, transparent);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
 }
 
 #presentation-view[data-session="running"] .presentation-controls .primary-button,
 #presentation-view[data-session="running"] .presentation-controls .secondary-button,
 #presentation-view[data-session="running"] .presentation-controls .ghost-button {
-  opacity: 0.15;
-  background: rgba(255, 255, 255, 0.28);
-  color: rgba(9, 17, 21, 0.42);
-  border-color: rgba(9, 17, 21, 0.08);
+  opacity: 0.72;
+  background: var(--presentation-control-quiet-bg);
+  color: var(--presentation-control-quiet-text);
+  border-color: var(--presentation-control-quiet-border);
 }
 
 #presentation-view[data-session="running"] .presentation-controls #edit-mode-button {
-  opacity: 0.44;
-  background: rgba(255, 255, 255, 0.52);
-  color: rgba(9, 17, 21, 0.84);
+  opacity: 0.92;
+  background: color-mix(in srgb, var(--presentation-control-quiet-bg) 90%, var(--presentation-control-bg));
+  color: var(--presentation-control-text);
+  border-color: color-mix(in srgb, var(--presentation-control-border) 88%, transparent);
 }
 
 #presentation-view[data-session="running"] .presentation-controls:hover .primary-button,
@@ -1074,9 +1099,21 @@ body[data-view="presentation"] .presentation-frame {
 #presentation-view[data-session="running"] .presentation-controls:focus-within .secondary-button,
 #presentation-view[data-session="running"] .presentation-controls:focus-within .ghost-button {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.92);
-  color: #091115;
-  border-color: rgba(9, 17, 21, 0.16);
+  background: var(--presentation-control-bg);
+  color: var(--presentation-control-text);
+  border-color: var(--presentation-control-border);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  #presentation-view[data-session="running"] .presentation-controls .primary-button,
+  #presentation-view[data-session="running"] .presentation-controls .secondary-button,
+  #presentation-view[data-session="running"] .presentation-controls .ghost-button {
+    opacity: 0.82;
+  }
+
+  #presentation-view[data-session="running"] .presentation-controls #edit-mode-button {
+    opacity: 1;
+  }
 }
 
 .toast-region {
@@ -1240,11 +1277,11 @@ body[data-view="presentation"] .presentation-frame {
   #presentation-view[data-session="running"] .presentation-controls .primary-button,
   #presentation-view[data-session="running"] .presentation-controls .secondary-button,
   #presentation-view[data-session="running"] .presentation-controls .ghost-button {
-    opacity: 0.1;
+    opacity: 0.82;
   }
 
   #presentation-view[data-session="running"] .presentation-controls #edit-mode-button {
-    opacity: 0.7;
+    opacity: 1;
   }
 
   .overtime-screen strong {
