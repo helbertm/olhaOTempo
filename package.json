@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "check:format": "node ./scripts/check-format.mjs",
+    "check:js": "node ./scripts/check-js.mjs",
+    "check:html": "node ./scripts/check-html.mjs",
+    "check:styles": "node ./scripts/check-styles.mjs",
+    "verify": "npm run check:format && npm run check:js && npm run check:html && npm run check:styles && npm test"
   }
 }
