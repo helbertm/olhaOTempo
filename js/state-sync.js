@@ -55,7 +55,7 @@ export function serializeSettingsFromDom({ app, elements }) {
     presentationTitle: elements.presentationTitle.value.trim(),
     themeId: elements.themeSelect.value,
     autoFullscreen: elements.autoFullscreenEnabled.checked,
-    keepScreenAwake: app.state.settings.keepScreenAwake,
+    keepScreenAwake: elements.keepScreenAwakeEnabled.checked,
     autoStartOnOpen: elements.autoStartEnabled.checked,
     showPresentationTimer: elements.showPresentationTimer.checked,
     showCurrentSection: elements.showCurrentSection.checked,

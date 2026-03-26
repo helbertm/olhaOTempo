@@ -538,32 +538,6 @@ main {
   transform: translateX(26px);
 }
 
-.switch-button {
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 62px;
-  height: 36px;
-  border: 1px solid rgba(24, 32, 33, 0.1);
-  border-radius: 999px;
-  padding: 0;
-  background: rgba(24, 32, 33, 0.06);
-  color: inherit;
-}
-
-.switch-button .switch-slider {
-  background: rgba(24, 32, 33, 0.14);
-}
-
-.switch-button-active .switch-slider {
-  background: rgba(15, 118, 110, 0.42);
-}
-
-.switch-button-active .switch-slider::after {
-  transform: translateX(26px);
-}
-
 .duration-card {
   padding: 18px;
   border-radius: var(--radius-lg);

@@ -18,7 +18,6 @@ import {
   handleReturnToEditMode as handleReturnToEditModeAction,
   handleStartPresentation as handleStartPresentationAction,
   handleToggleFullscreen as handleToggleFullscreenAction,
-  handleToggleWakeLock as handleToggleWakeLockAction,
   handleViewportChange as handleViewportChangeAction,
   handleVisibilityChange as handleVisibilityChangeAction,
   handleWakeLockChange as handleWakeLockChangeAction,
@@ -44,8 +43,8 @@ import {
   populateStaticOptions,
   refreshConfigSummary,
   renderConfig as renderConfigUi,
-  updateConfigWakeLockButton,
   updateDocumentTitle,
+  updateThemeSwitchGroup,
 } from "./ui-config.js";
 
 const loadResult = loadPersistedState();
@@ -110,8 +109,8 @@ attachEventListeners({
   handlers: {
     handleAddSection,
     openPresentationMode,
-    handleToggleWakeLock,
     handleThemeSwitchClick,
+    handleThemeSwitchKeydown,
     handleResetConfig,
     handleConfigInput,
     handleConfigChange,
@@ -161,10 +160,6 @@ function persistAppState() {
 
 function showToastMessage(message) {
   showToastNotification(elements, message);
-}
-
-function updateWakeLockToggle() {
-  updateConfigWakeLockButton({ app, elements });
 }
 
 function updatePresentationViewportMode() {
@@ -284,6 +279,77 @@ function handleThemeSwitchClick(event) {
   }
 }
 
+function handleThemeSwitchKeydown(event) {
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  const themeButtons = Array.from(
+    elements.themeSwitchGroup.querySelectorAll("[data-theme-choice]"),
+  );
+
+  if (themeButtons.length === 0) {
+    return;
+  }
+
+  const currentIndex = Math.max(
+    0,
+    themeButtons.findIndex((button) => button === target.closest("[data-theme-choice]")),
+  );
+  const lastIndex = themeButtons.length - 1;
+  let nextIndex = -1;
+
+  if (event.code === "ArrowRight" || event.code === "ArrowDown") {
+    nextIndex = currentIndex === lastIndex ? 0 : currentIndex + 1;
+  }
+
+  if (event.code === "ArrowLeft" || event.code === "ArrowUp") {
+    nextIndex = currentIndex === 0 ? lastIndex : currentIndex - 1;
+  }
+
+  if (event.code === "Home") {
+    nextIndex = 0;
+  }
+
+  if (event.code === "End") {
+    nextIndex = lastIndex;
+  }
+
+  if (nextIndex < 0) {
+    return;
+  }
+
+  event.preventDefault();
+  const nextButton = themeButtons[nextIndex];
+  const nextThemeId = nextButton.dataset.themeChoice;
+
+  if (!nextThemeId) {
+    return;
+  }
+
+  nextButton.focus();
+
+  if (nextThemeId !== elements.themeSelect.value) {
+    elements.themeSelect.value = nextThemeId;
+    syncSettingsFromDom({
+      app,
+      elements,
+      rerender: true,
+      persistState: persistAppState,
+      renderConfig: renderConfigView,
+      refreshConfigSummary: refreshConfigViewSummary,
+      updateDocumentTitle: updateConfigDocumentTitle,
+      renderPresentation: renderPresentationView,
+      showToast: showToastMessage,
+    });
+    return;
+  }
+
+  updateThemeSwitchGroup(elements, nextThemeId);
+}
+
 function handleConfigChange(event) {
   if (!(event.target instanceof HTMLElement)) {
     return;
@@ -389,17 +455,6 @@ function handleToggleFullscreen() {
   });
 }
 
-function handleToggleWakeLock() {
-  return handleToggleWakeLockAction({
-    app,
-    wakeLockController,
-    persistState: persistAppState,
-    updateConfigWakeLockButton: updateWakeLockToggle,
-    renderPresentation: renderPresentationView,
-    showToast: showToastMessage,
-  });
-}
-
 function handleReturnToEditMode() {
   return handleReturnToEditModeAction({
     app,
@@ -427,7 +482,6 @@ function handleWakeLockChange(nextState) {
   handleWakeLockChangeAction(
     {
       app,
-      updateConfigWakeLockButton: updateWakeLockToggle,
       renderPresentation: renderPresentationView,
       showToast: showToastMessage,
     },

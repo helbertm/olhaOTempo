@@ -1,7 +1,7 @@
 export const elements = {
   configView: document.querySelector("#config-view"),
   presentationView: document.querySelector("#presentation-view"),
-  configWakeLockButton: document.querySelector("#config-wake-lock-button"),
+  keepScreenAwakeEnabled: document.querySelector("#keep-screen-awake-enabled"),
   presentationTitle: document.querySelector("#presentation-title"),
   themeSelect: document.querySelector("#theme-select"),
   themeSwitchGroup: document.querySelector("#theme-switch-group"),

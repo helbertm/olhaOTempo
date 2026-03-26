@@ -25,8 +25,10 @@ export function populateStaticOptions(elements) {
         type="button"
         class="theme-switch-option"
         data-theme-choice="${theme.id}"
-        aria-pressed="false"
+        role="radio"
+        aria-checked="false"
         aria-label="${theme.label}"
+        tabindex="-1"
       >
         <span class="theme-switch-visual" aria-hidden="true">
           <span class="theme-switch-screen">
@@ -48,7 +50,7 @@ export function renderConfig({ app, elements }) {
   elements.themeSelect.value = settings.themeId;
   elements.autoFullscreenEnabled.checked = settings.autoFullscreen;
   elements.autoStartEnabled.checked = settings.autoStartOnOpen;
-  updateConfigWakeLockButton({ app, elements });
+  elements.keepScreenAwakeEnabled.checked = settings.keepScreenAwake;
   elements.showPresentationTimer.checked = settings.showPresentationTimer;
   elements.showCurrentSection.checked = settings.showCurrentSection;
   elements.showNextSection.checked = settings.showNextSection;
@@ -203,18 +205,13 @@ export function getStorageStatusMeta({ loadStatus, saveStatus }) {
   };
 }
 
-export function updateConfigWakeLockButton({ app, elements }) {
-  const isEnabled = app.state.settings.keepScreenAwake;
-  elements.configWakeLockButton.setAttribute("aria-pressed", String(isEnabled));
-  elements.configWakeLockButton.classList.toggle("switch-button-active", isEnabled);
-}
-
 export function updateThemeSwitchGroup(elements, activeThemeId) {
   const themeButtons = elements.themeSwitchGroup.querySelectorAll("[data-theme-choice]");
 
   for (const themeButton of themeButtons) {
     const isActive = themeButton.dataset.themeChoice === activeThemeId;
-    themeButton.setAttribute("aria-pressed", String(isActive));
+    themeButton.setAttribute("aria-checked", String(isActive));
+    themeButton.setAttribute("tabindex", isActive ? "0" : "-1");
     themeButton.classList.toggle("theme-switch-option-active", isActive);
   }
 }

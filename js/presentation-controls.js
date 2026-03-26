@@ -1,8 +1,5 @@
 import { createDefaultAppState } from "./defaults.js";
-import {
-  canStartPresentation,
-  normalizeSettings,
-} from "./model.js";
+import { canStartPresentation } from "./model.js";
 import { getPresentationViewportMode } from "./presentation-layout.js";
 import {
   hasActiveSession,
@@ -152,52 +149,6 @@ export async function handleToggleFullscreen({
   renderPresentation();
 }
 
-export async function handleToggleWakeLock({
-  app,
-  wakeLockController,
-  persistState,
-  updateConfigWakeLockButton,
-  renderPresentation,
-  showToast,
-}) {
-  const wantsKeepAwake = !app.state.settings.keepScreenAwake;
-  app.state.settings = normalizeSettings({
-    ...app.state.settings,
-    keepScreenAwake: wantsKeepAwake,
-  });
-  persistState();
-  updateConfigWakeLockButton();
-
-  if (!wantsKeepAwake) {
-    await wakeLockController.release();
-    showToast("Tela ligada desativada.");
-    renderPresentation();
-    return;
-  }
-
-  if (app.state.runtime.view !== "presentation") {
-    showToast("Tela ligada será usada ao iniciar a apresentação.");
-    renderPresentation();
-    return;
-  }
-
-  const result = await wakeLockController.request();
-
-  if (result.code === "unsupported") {
-    showToast("Wake lock indisponível. Ajuste brilho e energia manualmente se necessário.");
-  }
-
-  if (result.code === "blocked") {
-    showToast("O navegador não conseguiu manter a tela ligada. Verifique permissões e economia de energia.");
-  }
-
-  if (result.code === "active") {
-    showToast("Wake lock ativo enquanto o navegador permitir.");
-  }
-
-  renderPresentation();
-}
-
 export async function handleReturnToEditMode({
   app,
   wakeLockController,
@@ -318,7 +269,6 @@ export function handleViewportChange({
 
 export function handleWakeLockChange({
   app,
-  updateConfigWakeLockButton,
   renderPresentation,
   showToast,
 }, nextState) {
@@ -332,7 +282,6 @@ export function handleWakeLockChange({
     showToast("O navegador liberou o wake lock. Vamos tentar de novo quando a aba voltar ao foco.");
   }
 
-  updateConfigWakeLockButton();
   renderPresentation();
 }
 
