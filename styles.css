@@ -1202,6 +1202,30 @@ body[data-view="presentation"] .presentation-frame {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch-option,
+  .presentation-controls .primary-button,
+  .presentation-controls .secondary-button,
+  .presentation-controls .ghost-button,
+  .toast {
+    transition: none;
+    animation: none;
+  }
+
+  .timer-value-alert,
+  .overtime-screen strong {
+    animation: none;
+    transform: none;
+  }
+
+  .timer-value-alert {
+    opacity: 1;
+    text-shadow:
+      0 0 8px color-mix(in srgb, var(--timer-alert-color, var(--presentation-accent)) 26%, transparent),
+      0 0 18px color-mix(in srgb, var(--timer-alert-color, var(--presentation-accent)) 12%, transparent);
+  }
+}
+
 @media (max-width: 1120px) {
   .panel-grid,
   .timer-stack {

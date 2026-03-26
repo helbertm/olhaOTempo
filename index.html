@@ -249,19 +249,23 @@
               <div id="timer-stack" class="timer-stack" data-layout="dual">
                 <article class="timer-panel timer-panel-primary">
                   <span id="section-timer-label" class="timer-label sr-only">Etapa</span>
-                  <strong id="section-timer-value" class="timer-value">00:00</strong>
+                  <strong id="section-timer-value" class="timer-value" role="timer" aria-live="off">
+                    00:00
+                  </strong>
                 </article>
 
                 <article id="total-timer-panel" class="timer-panel timer-panel-secondary">
                   <span id="total-timer-label" class="timer-label sr-only">Total</span>
-                  <strong id="total-timer-value" class="timer-value">00:00</strong>
+                  <strong id="total-timer-value" class="timer-value" role="timer" aria-live="off">
+                    00:00
+                  </strong>
                 </article>
               </div>
             </section>
 
-            <section id="overtime-screen" class="overtime-screen hidden" aria-live="polite">
+            <section id="overtime-screen" class="overtime-screen hidden">
               <p class="overtime-label sr-only">Tempo extra após o roteiro</p>
-              <strong id="overtime-value">-00:00</strong>
+              <strong id="overtime-value" role="timer" aria-live="off">-00:00</strong>
               <p class="overtime-caption sr-only">
                 A última etapa terminou. O relógio abaixo mostra apenas o overtime total.
               </p>
@@ -274,7 +278,8 @@
         </section>
       </main>
 
-      <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+      <div id="app-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+      <div id="toast-region" class="toast-region"></div>
     </div>
 
     <template id="section-template">

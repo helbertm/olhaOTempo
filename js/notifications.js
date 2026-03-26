@@ -3,6 +3,8 @@ export function showToast(elements, message) {
     return;
   }
 
+  announceMessage(elements.liveRegion, message);
+
   const toast = document.createElement("div");
   toast.className = "toast";
   toast.textContent = message;
@@ -11,4 +13,16 @@ export function showToast(elements, message) {
   window.setTimeout(() => {
     toast.remove();
   }, 4200);
+}
+
+function announceMessage(liveRegion, message) {
+  if (!(liveRegion instanceof HTMLElement)) {
+    return;
+  }
+
+  liveRegion.textContent = "";
+
+  window.setTimeout(() => {
+    liveRegion.textContent = message;
+  }, 30);
 }

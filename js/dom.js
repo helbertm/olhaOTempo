@@ -49,5 +49,6 @@ export const elements = {
   sectionTimerValue: document.querySelector("#section-timer-value"),
   totalTimerLabel: document.querySelector("#total-timer-label"),
   totalTimerValue: document.querySelector("#total-timer-value"),
+  liveRegion: document.querySelector("#app-live-region"),
   toastRegion: document.querySelector("#toast-region"),
 };
