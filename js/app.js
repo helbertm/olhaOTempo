@@ -11,6 +11,7 @@ import {
   createDefaultAppState,
   createDefaultSection,
 } from "./defaults.js";
+import { getPresentationViewportMode } from "./presentation-layout.js";
 import {
   canStartPresentation,
   getConfiguredTotalSeconds,
@@ -115,6 +116,7 @@ const app = {
     shouldPersist: false,
     code: "inactive",
   },
+  presentationViewportMode: "desktop",
 };
 
 const fullscreenController = new FullscreenController({
@@ -131,6 +133,7 @@ initialize();
 
 function initialize() {
   populateStaticOptions();
+  updatePresentationViewportMode();
 
   if (app.state.runtime.view === "presentation" && !canStartPresentation(app.state.settings)) {
     app.state.runtime.view = "edit";
@@ -198,6 +201,8 @@ function attachEventListeners() {
   elements.fullscreenButton.addEventListener("click", handleToggleFullscreen);
   elements.editModeButton.addEventListener("click", handleReturnToEditMode);
 
+  window.addEventListener("resize", handleViewportChange, { passive: true });
+  window.visualViewport?.addEventListener("resize", handleViewportChange);
   document.addEventListener("visibilitychange", handleVisibilityChange);
   document.addEventListener("keydown", handlePresentationShortcuts);
 }
@@ -817,6 +822,7 @@ function renderPresentation() {
 
   elements.presentationView.dataset.theme = theme.id;
   elements.presentationView.dataset.session = runtime.session.status;
+  elements.presentationView.dataset.viewportMode = app.presentationViewportMode;
   elements.presentationTitleDisplay.textContent =
     settings.presentationTitle || "Apresentação sem título";
   elements.themeChip.textContent = `Tema: ${theme.label}`;
@@ -826,6 +832,8 @@ function renderPresentation() {
 
   if (!canStart) {
     const layoutMode = settings.showPresentationTimer ? "dual" : "single";
+    elements.presentationView.dataset.presentationState = "idle";
+    elements.presentationView.dataset.timerLayout = layoutMode;
     elements.currentSectionTitle.textContent = presentationHeader || "Revise o roteiro";
     elements.currentSectionTitle.classList.toggle("hidden", !presentationHeader);
     elements.sectionTimerLabel.textContent = "Restante da etapa";
@@ -852,6 +860,10 @@ function renderPresentation() {
   const isLastSection = Boolean(snapshot.currentSection) && !snapshot.nextSection;
   const shouldShowGlobalTimer = settings.showPresentationTimer && !isLastSection;
   const layoutMode = shouldShowGlobalTimer ? "dual" : "single";
+  elements.presentationView.dataset.presentationState = snapshot.isFinalOvertime
+    ? "overtime"
+    : layoutMode;
+  elements.presentationView.dataset.timerLayout = layoutMode;
   elements.presentationMain.dataset.layout = layoutMode;
   elements.timerStack.dataset.layout = layoutMode;
   elements.totalTimerPanel.classList.toggle("hidden", !shouldShowGlobalTimer);
@@ -1034,6 +1046,23 @@ function showToast(message) {
 
 function handleFullscreenChange(nextState) {
   app.fullscreenState = nextState;
+  renderPresentation();
+}
+
+function updatePresentationViewportMode() {
+  app.presentationViewportMode = getPresentationViewportMode(window);
+  elements.presentationView.dataset.viewportMode = app.presentationViewportMode;
+}
+
+function handleViewportChange() {
+  const nextViewportMode = getPresentationViewportMode(window);
+
+  if (nextViewportMode === app.presentationViewportMode) {
+    return;
+  }
+
+  app.presentationViewportMode = nextViewportMode;
+  elements.presentationView.dataset.viewportMode = nextViewportMode;
   renderPresentation();
 }
 
