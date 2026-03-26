@@ -26,13 +26,22 @@ Para esse cenário, `localStorage` atende o v1 com baixa complexidade e boa prev
 ## Estrutura do projeto
 
 - `index.html`: estrutura dos modos de edição e apresentação.
-- `styles.css`: layout responsivo, temas de alto contraste e estados visuais.
-- `js/app.js`: coordenação da UI, eventos, renderização e persistência.
+- `styles.css`: layout responsivo, temas, tokens de design system e estados visuais.
+- `DESIGN_SYSTEM.md`: fundamentos de tokens, famílias de componente e regras de evolução visual.
+- `js/app.js`: orquestração principal do app.
+- `js/app-bootstrap.js`: inicialização e registro de eventos.
+- `js/ui-config.js`: renderização e sincronização visual da tela de configuração.
+- `js/presentation-ui.js`: view model e render da tela de apresentação.
+- `js/presentation-controls.js`: sessão da apresentação, fullscreen, wake lock e atalhos.
+- `js/state-sync.js`: serialização do formulário, mutações estruturais e persistência.
+- `js/dom.js`: mapa centralizado de elementos.
+- `js/notifications.js`: toasts e anúncios para live region.
 - `js/model.js`: normalização e validação do modelo de dados.
 - `js/timer-engine.js`: cálculo do tempo com base em timestamps, avanço automático e overtime.
 - `js/capabilities.js`: integrações de Fullscreen API e Screen Wake Lock API.
 - `js/storage.js`: leitura/gravação no `localStorage`.
-- `tests/*.test.js`: testes de lógica.
+- `scripts/*.mjs`: guardrails locais para sintaxe, HTML, CSS e formatação.
+- `tests/*.test.js`: testes de lógica, view model e semântica crítica de markup.
 
 ## Modelo de configuração
 
@@ -163,10 +172,16 @@ Depois abra [http://localhost:4173](http://localhost:4173).
 
 ## Testes
 
-O projeto usa o test runner nativo do Node.
+O projeto usa o test runner nativo do Node e scripts locais de verificação.
 
 ```bash
 npm test
+```
+
+Validação completa local:
+
+```bash
+npm run verify
 ```
 
 Cobertura atual de lógica:
@@ -178,6 +193,23 @@ Cobertura atual de lógica:
 - transição para overtime
 - carga e salvamento em `localStorage`
 - fallback para armazenamento inválido
+- comparação estrutural de configurações
+- view model da apresentação para estados `dual`, `single` e cabeçalho
+- guardrails de markup para `radiogroup`, timers sem live region contínua e live region dedicada
+
+Scripts de higiene:
+
+- `npm run check:format`: tabs e trailing whitespace
+- `npm run check:js`: sintaxe de todos os módulos JS
+- `npm run check:html`: semântica mínima esperada do HTML principal
+- `npm run check:styles`: tokens e guardrails críticos de CSS
+
+## Governança de frontend
+
+- O contrato visual base está em `DESIGN_SYSTEM.md`.
+- Mudanças de UI devem preferir tokens semânticos já existentes em vez de novos valores soltos.
+- O projeto tem guardrails locais automatizados, mas ainda não usa screenshot diff nem engine externa de acessibilidade.
+- Responsividade e leitura à distância continuam exigindo smoke test manual em navegador real, principalmente em iPhone/iPad e cenários de fullscreen/PWA.
 
 ## Limitações intencionais de v1
 
