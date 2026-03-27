@@ -38,6 +38,7 @@ export function initializeApp({
 export function attachEventListeners({ elements, handlers }) {
   elements.addSectionButton.addEventListener("click", handlers.handleAddSection);
   elements.openPresentationButton.addEventListener("click", handlers.openPresentationMode);
+  elements.quickStartButton.addEventListener("click", handlers.openPresentationMode);
   elements.themeSwitchGroup.addEventListener("click", handlers.handleThemeSwitchClick);
   elements.themeSwitchGroup.addEventListener("keydown", handlers.handleThemeSwitchKeydown);
   elements.resetConfigButton.addEventListener("click", handlers.handleResetConfig);

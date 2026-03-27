@@ -10,6 +10,7 @@ const REQUIRED_PATTERNS = [
   /id="total-timer-value"[\s\S]*role="timer"[\s\S]*aria-live="off"/,
   /id="overtime-value"[\s\S]*role="timer"[\s\S]*aria-live="off"/,
   /id="back-to-top-button"[\s\S]*aria-label="Voltar ao topo"/,
+  /id="quick-start-button"[\s\S]*aria-label="Abrir modo apresentação"/,
   /class="app-beta-badge">BETA</,
   /class="app-beta-note">Versão beta\./,
   /<details class="alerts-disclosure alerts-block">/,

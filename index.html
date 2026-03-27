@@ -349,15 +349,26 @@
         </section>
       </main>
 
-      <button
-        id="back-to-top-button"
-        class="back-to-top-button hidden"
-        type="button"
-        aria-label="Voltar ao topo"
-      >
-        <span class="back-to-top-icon" aria-hidden="true">↑</span>
-        <span class="back-to-top-label">TOPO</span>
-      </button>
+      <div class="floating-action-stack">
+        <button
+          id="back-to-top-button"
+          class="floating-action-button floating-action-button-secondary back-to-top-button hidden"
+          type="button"
+          aria-label="Voltar ao topo"
+        >
+          <span class="back-to-top-icon" aria-hidden="true">↑</span>
+          <span class="floating-action-button-label back-to-top-label">TOPO</span>
+        </button>
+
+        <button
+          id="quick-start-button"
+          class="floating-action-button floating-action-button-primary quick-start-button hidden"
+          type="button"
+          aria-label="Abrir modo apresentação"
+        >
+          <span class="floating-action-button-label quick-start-label">Apresentar</span>
+        </button>
+      </div>
 
       <div id="app-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
       <div id="toast-region" class="toast-region"></div>

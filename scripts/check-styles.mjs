@@ -12,6 +12,8 @@ const REQUIRED_TOKENS = [
   '[data-content-layout="split"]',
   '[data-controls-layout="compact-grid"]',
   '[data-title-density="tight"]',
+  ".floating-action-stack",
+  ".floating-action-button",
   ".back-to-top-button",
 ];
 

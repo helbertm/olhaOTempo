@@ -214,6 +214,7 @@ function createRenderConfigHarness(appState) {
       sectionsTotalValue: new FakeNode(),
       configuredTotalValue: new FakeNode(),
       openPresentationButton: new FakeNode(),
+      quickStartButton: new FakeNode(),
       storageStatus,
       iosFullscreenNote,
       manualTotalNote: new FakeNode(),

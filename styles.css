@@ -320,20 +320,26 @@ h3 {
   border-color: rgba(180, 35, 24, 0.16);
 }
 
-.back-to-top-button {
+.floating-action-stack {
   position: fixed;
   right: calc(20px + env(safe-area-inset-right));
   bottom: calc(20px + env(safe-area-inset-bottom));
   z-index: 24;
+  display: grid;
+  justify-items: end;
+  gap: var(--space-3);
+}
+
+.floating-action-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
   min-height: 48px;
+  min-width: 44px;
   padding: 0.72rem 1rem;
   border: 1px solid rgba(24, 32, 33, 0.12);
   border-radius: var(--control-pill-radius);
-  background: rgba(255, 255, 255, 0.96);
-  color: var(--button-dark);
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(18px);
   transition:
@@ -344,13 +350,44 @@ h3 {
     box-shadow 140ms ease;
 }
 
-.back-to-top-button:hover {
-  transform: var(--state-hover-raise);
-  box-shadow: 0 16px 32px rgba(24, 32, 33, 0.14);
+.floating-action-button-primary {
+  background: var(--button-dark);
+  color: var(--button-dark-text);
+  border-color: rgba(24, 32, 33, 0.16);
 }
 
-.back-to-top-button:focus-visible {
+.floating-action-button-secondary {
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--button-dark);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .floating-action-button:hover {
+    transform: var(--state-hover-raise);
+    box-shadow: 0 16px 32px rgba(24, 32, 33, 0.14);
+  }
+}
+
+.floating-action-button:focus-visible {
   border-color: rgba(15, 118, 110, 0.3);
+}
+
+.floating-action-button-label {
+  line-height: 1;
+}
+
+.quick-start-button {
+  min-width: min(220px, calc(100vw - 40px));
+}
+
+.quick-start-label {
+  font-size: var(--type-body-sm);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.back-to-top-button {
+  min-width: max-content;
 }
 
 .back-to-top-icon {
@@ -364,7 +401,7 @@ h3 {
   letter-spacing: 0.14em;
 }
 
-body[data-view="presentation"] .back-to-top-button {
+body[data-view="presentation"] .floating-action-stack {
   display: none !important;
 }
 
@@ -1563,7 +1600,7 @@ body[data-view="presentation"] .presentation-frame {
 
 @media (prefers-reduced-motion: reduce) {
   .theme-switch-option,
-  .back-to-top-button,
+  .floating-action-button,
   .presentation-controls .primary-button,
   .presentation-controls .secondary-button,
   .presentation-controls .ghost-button,
@@ -1604,9 +1641,13 @@ body[data-view="presentation"] .presentation-frame {
     padding-top: 10px;
   }
 
-  .back-to-top-button {
+  .floating-action-stack {
     right: calc(14px + env(safe-area-inset-right));
     bottom: calc(14px + env(safe-area-inset-bottom));
+    gap: var(--space-2);
+  }
+
+  .floating-action-button {
     min-height: 52px;
     padding: 0.82rem 1.08rem;
   }

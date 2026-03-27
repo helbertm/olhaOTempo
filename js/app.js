@@ -1,6 +1,6 @@
 import {
-  createBackToTopController,
-} from "./back-to-top.js";
+  createFloatingActionController,
+} from "./floating-actions.js";
 import {
   FullscreenController,
   WakeLockController,
@@ -91,7 +91,7 @@ const fullscreenController = new FullscreenController({
 const wakeLockController = new WakeLockController({
   onChange: handleWakeLockChange,
 });
-const backToTopController = createBackToTopController({
+const floatingActionController = createFloatingActionController({
   app,
   elements,
   windowRef: window,
@@ -141,7 +141,7 @@ attachEventListeners({
 
 function renderConfigView() {
   renderConfigUi({ app, elements });
-  backToTopController.update();
+  floatingActionController.update();
 }
 
 function refreshConfigViewSummary() {
@@ -160,7 +160,7 @@ function renderPresentationView() {
   });
 
   app.lastPresentationSnapshot = snapshot;
-  backToTopController.update();
+  floatingActionController.update();
   syncRenderLoop();
   return snapshot;
 }
@@ -186,7 +186,7 @@ function handleViewportChange() {
     elements,
     renderPresentation: renderPresentationView,
   });
-  backToTopController.update();
+  floatingActionController.update();
 }
 
 function setCurrentView(view, options) {
@@ -200,15 +200,15 @@ function setCurrentView(view, options) {
     view,
     options,
   );
-  backToTopController.update();
+  floatingActionController.update();
 }
 
 function handleWindowScroll() {
-  backToTopController.handleScroll();
+  floatingActionController.handleScroll();
 }
 
 function handleBackToTopClick() {
-  backToTopController.scrollToTop();
+  floatingActionController.scrollToTop();
 }
 
 function ensureFullscreen(options) {

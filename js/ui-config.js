@@ -193,6 +193,7 @@ export function refreshConfigSummary({ app, elements }) {
   elements.sectionsTotalValue.textContent = formatClockSeconds(sectionsTotalSeconds);
   elements.configuredTotalValue.textContent = formatClockSeconds(configuredTotalSeconds);
   elements.openPresentationButton.disabled = !canStart;
+  elements.quickStartButton.disabled = !canStart;
   elements.storageStatus.textContent = storageMeta.label;
   elements.storageStatus.classList.toggle("inline-status-saved", storageMeta.state === "saved");
   elements.storageStatus.classList.toggle(
