@@ -27,7 +27,7 @@ Para esse cenário, `localStorage` atende o v1 com baixa complexidade e boa prev
 
 - `index.html`: estrutura dos modos de edição e apresentação.
 - `styles.css`: layout responsivo, temas, tokens de design system e estados visuais.
-- `DESIGN_SYSTEM.md`: fundamentos de tokens, famílias de componente e regras de evolução visual.
+- `design_system.md`: fundamentos de tokens, famílias de componente e regras de evolução visual.
 - `js/app.js`: orquestração principal do app.
 - `js/app-bootstrap.js`: inicialização e registro de eventos.
 - `js/ui-config.js`: renderização e sincronização visual da tela de configuração.
@@ -206,7 +206,7 @@ Scripts de higiene:
 
 ## Governança de frontend
 
-- O contrato visual base está em `DESIGN_SYSTEM.md`.
+- O contrato visual base está em `design_system.md`.
 - Mudanças de UI devem preferir tokens semânticos já existentes em vez de novos valores soltos.
 - O projeto tem guardrails locais automatizados, mas ainda não usa screenshot diff nem engine externa de acessibilidade.
 - Responsividade e leitura à distância continuam exigindo smoke test manual em navegador real, principalmente em iPhone/iPad e cenários de fullscreen/PWA.

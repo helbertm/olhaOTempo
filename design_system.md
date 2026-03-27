@@ -3,7 +3,6 @@
 ## Metadata
 
 - Canonical file: `design_system.md`
-- Legacy file: `DESIGN_SYSTEM.md`
 - Scope: static presentation-timer application
 - Purpose: normative UI engineering contract for implementation and review
 
