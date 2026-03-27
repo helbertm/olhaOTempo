@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { createDefaultAppState } from "../js/defaults.js";
 import {
+  populateStaticOptions,
   renderConfig,
   updateDocumentTitle,
 } from "../js/ui-config.js";
@@ -273,6 +274,25 @@ test("titulo do documento inclui o roteiro quando ele difere do nome do app", ()
   } finally {
     globalThis.document = previousDocument;
   }
+});
+
+test("populateStaticOptions expõe label e descricao visiveis para cada tema", () => {
+  const elements = {
+    themeSwitchGroup: {
+      innerHTML: "",
+    },
+  };
+
+  populateStaticOptions(elements);
+
+  assert.match(elements.themeSwitchGroup.innerHTML, /theme-stage-dark-label/);
+  assert.match(elements.themeSwitchGroup.innerHTML, /Palco escuro/);
+  assert.match(
+    elements.themeSwitchGroup.innerHTML,
+    /Fundo escuro, contraste frio e leitura forte em auditórios\./,
+  );
+  assert.match(elements.themeSwitchGroup.innerHTML, /aria-labelledby="theme-stage-dark-label"/);
+  assert.match(elements.themeSwitchGroup.innerHTML, /aria-describedby="theme-stage-dark-description"/);
 });
 
 test("renderConfig preserva aberto o disclosure de alertas apos rerender estrutural", () => {

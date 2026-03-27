@@ -26,9 +26,14 @@ export function populateStaticOptions(elements) {
         data-theme-choice="${theme.id}"
         role="radio"
         aria-checked="false"
-        aria-label="${theme.label}"
+        aria-labelledby="theme-${theme.id}-label"
+        aria-describedby="theme-${theme.id}-description"
         tabindex="-1"
       >
+        <span class="theme-switch-copy">
+          <span id="theme-${theme.id}-label" class="theme-switch-label">${theme.label}</span>
+          <span id="theme-${theme.id}-description" class="theme-switch-description">${theme.description}</span>
+        </span>
         <span class="theme-switch-visual" aria-hidden="true">
           <span class="theme-switch-screen">
             <span class="theme-switch-screen-title">TITULO</span>

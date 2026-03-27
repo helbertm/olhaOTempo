@@ -132,6 +132,8 @@
 - Use native semantics.
 - Keep visible text adjacent to the control.
 - Focus must apply at the item container level when the native input receives focus.
+- Visual theme selectors must include a visible label and a short visible description.
+- Color preview may reinforce a theme choice, but it must not be the primary semantic cue.
 
 ## 11. Presentation Controls
 
